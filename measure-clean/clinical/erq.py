@@ -3,7 +3,7 @@ from ..measure import Measure
 import numpy as np
 import pandas as pd
 
-
+# Emotion Regulation Questionnaire
 # https://www.carepatron.com/files/emotion-regulation-questionnaire.pdf
 
 class ERQ(Measure):

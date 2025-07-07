@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 
+# World Health Organization Quality-of-Life Scale
 # https://depts.washington.edu/seaqol/docs/WHOQOL-BREF%20and%20Scoring%20Instructions.pdf
 
 class WHOQOL(Measure):

@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 
 
+# Social and Occupational Functioning Assessment Scale
+
 class SOFASRating(Measure):
     @classmethod
     def get_prefix(cls):

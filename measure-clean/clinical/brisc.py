@@ -3,7 +3,7 @@ from ..measure import Measure
 import numpy as np
 import pandas as pd
 
-
+# Brief Risk-Resilience Index for Screening
 # https://pmc.ncbi.nlm.nih.gov/articles/PMC3489810/
 
 class BRISC15(Measure):
