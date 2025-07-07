@@ -3,6 +3,7 @@ from ..measure import Measure
 import numpy as np
 import pandas as pd
 
+
 # Emotion Regulation Questionnaire
 # https://www.carepatron.com/files/emotion-regulation-questionnaire.pdf
 
@@ -27,6 +28,6 @@ class ERQ(Measure):
 
         scored = pd.DataFrame([], columns=['cog', 'sup'])
         for score, cols in zip(scored.columns, [cog, sup]):
-            cols = cls.subset_cols_num(df.columns, cols, r'erq_(\d+)')
+            cols = cls.subset_cols_num(df.columns, cols, fr'{cls.get_prefix()}_(\d+)')
             scored[score] = df[cols].sum(axis=1, skipna=False)
         return scored

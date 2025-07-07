@@ -35,6 +35,6 @@ class BAIS(Measure):
 
         scored = pd.DataFrame([], columns=['drive', 'fun', 'reward', 'bis'])
         for score, cols in zip(scored.columns, [drive, fun, reward, bis]):
-            cols = cls.subset_cols_num(df.columns, cols, r"bais_(\d+)")
+            cols = cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")
             scored[score] = df[cols].sum(axis=1, skipna=False)
         return scored

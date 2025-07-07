@@ -35,6 +35,6 @@ class WHOQOL(Measure):
 
         scored = pd.DataFrame([], columns=['phyhea', 'psy', 'socrel', 'env'])
         for score, cols in zip(scored.columns, [phyhea, psy, socrel, env]):
-            cols = cls.subset_cols_num(df.columns, cols, r"whoqol_(\d+)")
+            cols = cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")
             scored[score] = df[cols].sum(axis=1, skipna=False)
         return scored

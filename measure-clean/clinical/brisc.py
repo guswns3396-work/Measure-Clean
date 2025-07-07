@@ -3,13 +3,14 @@ from ..measure import Measure
 import numpy as np
 import pandas as pd
 
+
 # Brief Risk-Resilience Index for Screening
 # https://pmc.ncbi.nlm.nih.gov/articles/PMC3489810/
 
 class BRISC15(Measure):
     @classmethod
     def get_prefix(cls):
-        return 'brisc'
+        return 'brisc15'
 
     @classmethod
     def get_cols(cls):
@@ -32,6 +33,6 @@ class BRISC15(Measure):
         for score in mapping:
             cols = mapping[score]
             scores.append(
-                df[cls.subset_cols_num(df.columns, cols, r"brisc_(\d+)")].sum(axis=1, skipna=False)
+                df[cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")].sum(axis=1, skipna=False)
             )
         return pd.concat(scores, axis=1)
