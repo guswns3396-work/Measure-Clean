@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import numpy as np
 import pandas as pd
 
 
@@ -69,6 +70,20 @@ class Measure(ABC):
         """
         return cols[cols.str.extract(re_str)[0].astype(float).isin(num)]
 
+    @staticmethod
+    def argwhere(df):
+        """
+        returns list of (index, colname) tuples where df is True
+        :param df: pd.DataFrame of Bool
+        :return: returns list of (index, colname) tuples where df is True
+        """
+        idx = np.argwhere(df)
+        idx = pd.DataFrame(idx, columns=['index', 'column'])
+        idx['index'] = idx['index'].map(lambda x: df.index[x])
+        idx['column'] = idx['column'].map(lambda x: df.columns[x])
+        return idx.to_numpy()
+
+
     @classmethod
     def process(cls, df, output_path, to_na=True, mapping=None, rev_code=False, **kwargs):
         """
@@ -100,7 +115,7 @@ class Measure(ABC):
         # convert or raise
         if to_na:
             for (i, j) in idx:
-                df.iloc[i, j] = np.nan
+                df.loc[i, j] = np.nan
         else:
             if idx:
                 raise ExceptionWithData('Invalid range', idx)

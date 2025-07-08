@@ -19,7 +19,7 @@ class ERQ(Measure):
     @classmethod
     def check_range(cls, df):
         vals = [i in range(1, 7 + 1)]
-        return np.argwhere(~df.isin(vals + [np.nan]))
+        return cls.argwhere(~df.isin(vals + [np.nan]))
 
     @classmethod
     def score(cls, df):

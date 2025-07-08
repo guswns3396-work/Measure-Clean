@@ -19,7 +19,7 @@ class DASS42(Measure):
     @classmethod
     def check_range(cls, df):
         vals = [i in range(0, 3 + 1)]
-        return np.argwhere(~df.isin(vals + [np.nan]))
+        return cls.argwhere(~df.isin(vals + [np.nan]))
 
     @classmethod
     def score(cls, df):
