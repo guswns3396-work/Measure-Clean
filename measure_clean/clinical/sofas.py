@@ -18,7 +18,7 @@ class SOFASRating(Measure):
     @classmethod
     def check_range(cls, df):
         vals = [i in range(0, 100 + 1)]
-        return cls.argwhere(cls.check_discrete(df, vals))
+        return cls.argwhere(cls.is_valid_discrete(df, vals))
 
     @classmethod
     def score(cls, df):
@@ -37,7 +37,7 @@ class SOFASCategory(Measure):
     @classmethod
     def check_range(cls, df):
         vals = [i in range(0, 10 + 1)]
-        return cls.argwhere(cls.check_discrete(df, vals))
+        return cls.argwhere(cls.is_valid_discrete(df, vals))
 
     @classmethod
     def score(cls, df):

@@ -71,7 +71,7 @@ class Measure(ABC):
         return cols[cols.str.extract(re_str)[0].astype(float).isin(num)]
 
     @staticmethod
-    def check_discrete(df, vals):
+    def is_valid_discrete(df, vals):
         """
         checks whether values in df are within range of discrete values or is missing
         :param df: pd.DataFrame

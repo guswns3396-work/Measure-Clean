@@ -1,6 +1,6 @@
 from ..measure import Measure
 
-
+import numpy as np
 import pandas as pd
 
 
@@ -20,7 +20,11 @@ class HDRS(Measure):
         idx = []
         for cols, vals in zip([lik04, lik02], [range(0, 4 + 1), range(0, 2 + 1)]):
             cols = cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")
-            idx.append(cls.argwhere(~df[cols].isin([i for i in vals] + [np.nan])))
+            idx.append(
+                cls.argwhere(
+                    cls.is_valid_discrete(df[cols], [i for i in vals])
+                )
+            )
         idx = np.concatenate(idx, axis=0)
         return idx
 
