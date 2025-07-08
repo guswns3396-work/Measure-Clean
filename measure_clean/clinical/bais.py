@@ -1,6 +1,5 @@
 from ..measure import Measure
 
-import numpy as np
 import pandas as pd
 
 
@@ -19,7 +18,7 @@ class BAIS(Measure):
     @classmethod
     def check_range(cls, df):
         vals = [i in range(1, 4 + 1)]
-        return cls.argwhere(~df.isin(vals + [np.nan]))
+        return cls.argwhere(cls.check_discrete(df, vals))
 
     @classmethod
     def score(cls, df):

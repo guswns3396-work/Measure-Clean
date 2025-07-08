@@ -71,6 +71,16 @@ class Measure(ABC):
         return cols[cols.str.extract(re_str)[0].astype(float).isin(num)]
 
     @staticmethod
+    def check_discrete(df, vals):
+        """
+        checks whether values in df are within range of discrete values or is missing
+        :param df: pd.DataFrame
+        :param vals: list of acceptable values
+        :return: pd.DataFrame of dtype Bool
+        """
+        return ~df.isin(vals) & ~df.isna()
+
+    @staticmethod
     def argwhere(df):
         """
         returns list of (index, colname) tuples where df is True
