@@ -88,9 +88,15 @@ class Measure(ABC):
         :return: returns pd.DataFrame where each row indicates where df is True
         """
         idx = np.argwhere(df)
-        idx = pd.DataFrame(idx, columns=['index', 'column'])
-        idx['index'] = idx['index'].map(lambda x: df.index[x])
-        idx['column'] = idx['column'].map(lambda x: df.columns[x])
+        if idx.shape[-1] == 2:
+            idx = pd.DataFrame(idx, columns=['index', 'column'])
+            idx['index'] = idx['index'].map(lambda x: df.index[x])
+            idx['column'] = idx['column'].map(lambda x: df.columns[x])
+        elif idx.shape[-1] == 1:
+            idx = pd.DataFrame(idx, columns=['index'])
+            idx['column'] = df.name
+        else:
+            raise ValueError('idx should be either pd.DataFrame of pd.Series')
         return idx
 
     @classmethod
