@@ -36,7 +36,7 @@ class Measure(ABC):
         """
         scores the measure
         :param df: DataFrame of data (should match the expected coding of scoring guide)
-        :return: pd.Series of scores
+        :return: pd.Series or pd.DataFrame of scores
         """
         pass
 
@@ -76,7 +76,7 @@ class Measure(ABC):
         checks whether values in df are within range of discrete values or is missing
         :param df: pd.DataFrame
         :param vals: list of acceptable values
-        :return: pd.DataFrame of dtype Bool
+        :return: pd.DataFrame or pd.Series of dtype Bool
         """
         return ~df.isin(vals) & ~df.isna()
 
@@ -85,14 +85,13 @@ class Measure(ABC):
         """
         returns list of (index, colname) tuples where df is True
         :param df: pd.DataFrame of Bool
-        :return: returns list of (index, colname) tuples where df is True
+        :return: returns pd.DataFrame where each row indicates where df is True
         """
         idx = np.argwhere(df)
         idx = pd.DataFrame(idx, columns=['index', 'column'])
         idx['index'] = idx['index'].map(lambda x: df.index[x])
         idx['column'] = idx['column'].map(lambda x: df.columns[x])
-        return idx.to_numpy()
-
+        return idx
 
     @classmethod
     def process(cls, df, output_path, to_na=True, mapping=None, rev_code=False, **kwargs):
@@ -124,8 +123,8 @@ class Measure(ABC):
         idx = cls.check_range(df)
         # convert or raise
         if to_na:
-            for (i, j) in idx:
-                df.loc[i, j] = np.nan
+            for row in idx.iterrows():
+                df.loc[row['index'], row['column']] = np.nan
         else:
             if idx:
                 raise ExceptionWithData('Invalid range', idx)

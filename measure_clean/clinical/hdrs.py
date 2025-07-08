@@ -25,7 +25,7 @@ class HDRS(Measure):
                     cls.is_valid_discrete(df[cols], [i for i in vals])
                 )
             )
-        idx = np.concatenate(idx, axis=0)
+        idx = pd.concat(idx, axis=0)
         return idx
 
 

@@ -33,7 +33,7 @@ class TestCheckRange(unittest.TestCase):
             tuple([tmp.index[x[0]], tmp.columns[x[1]]])
             for x in target
         ])
-        source = set([tuple(x) for x in source.tolist()])
+        source = set([tuple([x['index'], x['column']]) for x in source.iterrows()])
         self.assertEqual(target, source)
 
 
