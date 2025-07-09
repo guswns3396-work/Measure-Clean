@@ -158,7 +158,7 @@ class Measure(ABC):
         # subset to relevant columns depending on if score already included
         score_cols = [f"{cls.get_prefix()}_{x}" for x in cls.get_suffixes()]
         df = df.loc[:, [*cls.get_cols(), *df.columns[df.columns.isin(score_cols)]]]
-        assert not df.columns.duplicated.any()
+        assert not df.columns.duplicated().any()
         # check if any outside of range
         idx = cls.check_range(df)
         # convert or raise
