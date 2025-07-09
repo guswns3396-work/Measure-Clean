@@ -110,6 +110,7 @@ class Measure(ABC):
         :return: pd.DataFrame of scored data without duplicate columns
         """
         def drop_if_same(df, keep):
+            assert len(df) <= 2
             # drop one if no discrepancy
             if df.eq(df.iloc[0, :], axis='columns').all().all():
                 ser = df.iloc[0, :]
