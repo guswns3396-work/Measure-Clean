@@ -61,5 +61,40 @@ class TestScore(unittest.TestCase):
         self.assertTrue((target == source).all())
 
 
+class TestProcess(unittest.TestCase):
+
+    def setUp(self):
+        self.TestMeasure = HDRS21()
+
+    def test__standard__process(self):
+        np.random.seed(0)
+        lik04 = [1, 2, 3, 7, 8, 9, 10, 11, 15, 19, 20]
+        lik02 = [4, 5, 6, 12, 13, 14, 16, 17, 18, 21]
+        df1 = pd.DataFrame(
+            np.random.randint(low=0, high=5, size=(5, len(lik04))),
+            columns=[f"{self.TestMeasure.get_prefix()}_{i}" for i in lik04]
+        )
+        df2 = pd.DataFrame(
+            np.random.randint(low=0, high=3, size=(5, len(lik02))),
+            columns=[f"{self.TestMeasure.get_prefix()}_{i}" for i in lik02]
+        )
+        df = pd.concat([df1, df2], axis=1)
+        df['ID'] = 1
+        df['SES'] = 2
+        df = df.set_index(['ID', 'SES'])
+
+        target = pd.concat([df1, df2], axis=1)
+        target['ID'] = 1
+        target['SES'] = 2
+        target = target.set_index(['ID', 'SES'])
+
+        source = self.TestMeasure.process(df, None)
+        target[
+            f"{self.TestMeasure.get_prefix()}_{self.TestMeasure.get_suffixes()[-1]}"
+        ] = [34, 19, 25, 27, 26]
+
+        self.assertTrue((source.sort_index(axis=1) == target.sort_index(axis=1)).all().all())
+
+
 if __name__ == "__main__":
     unittest.main()
