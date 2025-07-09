@@ -29,10 +29,13 @@ class BRISC15(Measure):
             'soc': [11, 12, 13, 14, 15]
         }
 
-        scores = []
+        scores = pd.DataFrame(
+            [],
+            columns=[f"{cls.get_prefix()}_{x}" for x in mapping]
+        )
         for score in mapping:
             cols = mapping[score]
-            scores.append(
-                df[cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")].sum(axis=1, skipna=False)
-            )
-        return pd.concat(scores, axis=1)
+            scores[f"{cls.get_prefix()}_{score}"] = df[
+                cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")
+            ].sum(axis=1, skipna=False)
+        return scores

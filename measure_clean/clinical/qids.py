@@ -37,5 +37,5 @@ class QIDS(Measure):
             # psychomotor subscore
             np.nanmax(df[[fr"{cls.get_prefix()}_{i}" for i in range(15, 16 + 1)]], axis=1)
         )
-        score = np.sum(np.vstack(subscores).T, axis=1)
+        score = pd.Series(np.sum(np.vstack(subscores).T, axis=1), name=f"{cls.get_prefix()}_score")
         return score

@@ -26,7 +26,7 @@ class ERQ(Measure):
         cog = [1, 3, 5, 7, 8, 10]
         sup = [2, 6, 4, 9]
 
-        scored = pd.DataFrame([], columns=['cog', 'sup'])
+        scored = pd.DataFrame([], columns=[f"{cls.get_prefix()}_{x}" for x in ['cog', 'sup']])
         for score, cols in zip(scored.columns, [cog, sup]):
             cols = cls.subset_cols_num(df.columns, cols, fr'{cls.get_prefix()}_(\d+)')
             scored[score] = df[cols].sum(axis=1, skipna=False)

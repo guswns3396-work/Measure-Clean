@@ -23,4 +23,5 @@ class GAD7(Measure):
     @classmethod
     def score(cls, df):
         score = df.sum(axis=1, skipna=False)
+        score.name = f"{cls.get_prefix()}_score"
         return score
