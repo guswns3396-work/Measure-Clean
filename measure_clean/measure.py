@@ -26,7 +26,7 @@ class Measure(ABC):
         """
         checks range and returns indices of invalid values
         :param df: DataFrame of data
-        :return: indices of invalid values
+        :return: pd.DataFrame where each row indicates indices where df is True
         """
         pass
 
@@ -74,7 +74,7 @@ class Measure(ABC):
     def is_valid_discrete(df, vals):
         """
         checks whether values in df are within range of discrete values or is missing
-        :param df: pd.DataFrame
+        :param df: pd.DataFrame or pd.Series
         :param vals: list of acceptable values
         :return: pd.DataFrame or pd.Series of dtype Bool
         """
@@ -84,14 +84,16 @@ class Measure(ABC):
     def argwhere(df):
         """
         returns list of (index, colname) tuples where df is True
-        :param df: pd.DataFrame of Bool
-        :return: returns pd.DataFrame where each row indicates where df is True
+        :param df: pd.DataFrame or pd.Series of dtype Bool
+        :return: pd.DataFrame where each row indicates indices where df is True
         """
         idx = np.argwhere(df)
+        # dataframe
         if idx.shape[-1] == 2:
             idx = pd.DataFrame(idx, columns=['index', 'column'])
             idx['index'] = idx['index'].map(lambda x: df.index[x])
             idx['column'] = idx['column'].map(lambda x: df.columns[x])
+        # series
         elif idx.shape[-1] == 1:
             idx = pd.DataFrame(idx, columns=['index'])
             idx['column'] = df.name
@@ -99,15 +101,42 @@ class Measure(ABC):
             raise ValueError('idx should be either pd.DataFrame of pd.Series')
         return idx
 
+    @staticmethod
+    def handle_duplicate(df, keep):
+        """
+        handles potential duplicate columns due to scoring
+        :param df: pd.DataFrame of scored data
+        :param keep: how to handle discrepancy
+        :return: pd.DataFrame of scored data without duplicate columns
+        """
+        def drop_if_same(df, keep):
+            # drop one if no discrepancy
+            if df.eq(df.iloc[0, :], axis='columns').all().all():
+                ser = df.iloc[0, :]
+            # decide how to drop if discrepancy
+            else:
+                if keep:
+                    ser = df.iloc[~df.index.duplicated(keep=keep), :].squeeze()
+                else:
+                    raise ExceptionWithData(
+                        'Handling of duplicates undefined',
+                        df.iloc[df.index.duplicated(keep=False), :]
+                    )
+            return ser
+        df = df.T
+        df = df.groupby(df.index).apply(lambda x: drop_if_same(x, keep))
+        return df.T
+
     @classmethod
-    def process(cls, df, output_path, to_na=True, mapping=None, rev_code=False, **kwargs):
+    def process(cls, df, output_path, mapping=None, to_na=True, rev_code=False, keep=None, **kwargs):
         """
         process the data
         :param df: DataFrame of data
         :param output_path: output path
-        :param to_na: bool whether to convert invalid values to np.nan
         :param mapping: dict mapping df column names to expected measure column names
+        :param to_na: bool whether to convert invalid values to np.nan
         :param rev_code: bool whether to reverse code
+        :param keep: 'first' keeps the original score, 'last' keeps newly calculated score
         :return: DataFrame of relevant data + score
         """
         df = df.copy()
@@ -117,29 +146,36 @@ class Measure(ABC):
         # rename columns to match expected
         if mapping:
             df = df.rename(columns=mapping)
-        # make sure columns for measure are in df
-        if not cls.get_cols().isin(df.columns).all():
-            raise ExceptionWithData(
-                'Expected columns not found',
-                cls.get_cols()[~cls.get_cols().isin(df.columns)]
-            )
-        # subset to relevant columns
-        df = df.loc[:, cls.get_cols()]
+        # subset to relevant columns depending on if score already included
+        # TODO: need to implement if score does not end in _score
+        if f"{cls.get_prefix()}_score" in df.columns:
+            df = df.loc[:, [*cls.get_cols(), f"{cls.get_prefix()}_score"]]
+        else:
+            df = df.loc[:, cls.get_cols()]
+        assert not df.columns.duplicated.any()
         # check if any outside of range
         idx = cls.check_range(df)
         # convert or raise
         if to_na:
             for row in idx.iterrows():
                 df.loc[row['index'], row['column']] = np.nan
-        else:
-            if idx:
-                raise ExceptionWithData('Invalid range', idx)
+        elif len(idx) > 0:
+            raise ExceptionWithData('Invalid range', idx)
         # reverse code
         if rev_code:
             df = cls.reverse_code(df, kwargs['col_num'], kwargs['re_str'], kwargs['col_min'], kwargs['col_max'])
         # score
+        assert isinstance(df, pd.DataFrame)
         score = cls.score(df)
-        # save df
         df = pd.concat([df[cls.get_cols()], score], axis=1)
+        assert isinstance(df, pd.DataFrame)
+        # handle potential duplicate columns due to scoring
+        df = cls.handle_duplicate(df, keep)
+        # check
+        assert df.columns.str.match(fr"^{cls.get_prefix()}_.+$").all()
+        assert not df.columns.duplicated().any()
+        # reorder
+        ...
+        # save df
         df.to_csv(output_path)
         return df

@@ -51,6 +51,32 @@ class TestReverseCode(unittest.TestCase):
     def test__nan__reverse_code(self):
         pass
 
+
+class TestHandleDuplicate(unittest.TestCase):
+    def test__standard__first__handle_duplicate(self):
+        df = pd.DataFrame([[1, 2, 3, 10], [4, 5, 6, 11]], columns=['a', 'b', 'c', 'c'])
+        target = pd.DataFrame([[1, 2, 3], [4, 5, 6]], columns=['a', 'b', 'c'])
+        source = Measure.handle_duplicate(df, keep='first')
+
+        self.assertTrue((target == source).all().all())
+
+    def test__standard__last__handle_duplicate(self):
+        df = pd.DataFrame([[1, 2, 3, 10], [4, 5, 6, 11]], columns=['a', 'b', 'c', 'c'])
+        target = pd.DataFrame([[1, 2, 10], [4, 5, 11]], columns=['a', 'b', 'c'])
+        source = Measure.handle_duplicate(df, keep='last')
+
+        self.assertTrue((target == source).all().all())
+
+    def test__no_keep__handle_duplicate(self):
+        df = pd.DataFrame([[1, 2, 3, 10], [4, 5, 6, 11]], columns=['a', 'b', 'c', 'c'])
+        target = df.T.loc['c']
+        try:
+            Measure.handle_duplicate(df, keep=None)
+        except Exception as e:
+            source = e.data
+
+        self.assertTrue((target == source).all().all())
+
 # TODO: implement tests for other methods
 
 
