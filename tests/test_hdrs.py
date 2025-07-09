@@ -57,6 +57,7 @@ class TestScore(unittest.TestCase):
         df = pd.concat([df1, df2], axis=1)
         target = [34, 19, 25, 27, 26]
         source = self.TestMeasure.score(df)
+
         self.assertTrue((target == source).all())
 
 
