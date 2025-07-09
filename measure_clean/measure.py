@@ -156,7 +156,10 @@ class Measure(ABC):
         if mapping:
             df = df.rename(columns=mapping)
         # subset to relevant columns depending on if score already included
-        score_cols = [f"{cls.get_prefix()}_{x}" for x in cls.get_suffixes()]
+        if len(cls.get_suffixes()) == 0:
+            score_cols = []
+        else:
+            score_cols = [f"{cls.get_prefix()}_{x}" for x in cls.get_suffixes()]
         df = df.loc[:, [*cls.get_cols(), *df.columns[df.columns.isin(score_cols)]]]
         assert not df.columns.duplicated().any()
         # check if any outside of range
