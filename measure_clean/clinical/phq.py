@@ -13,6 +13,10 @@ class PHQ7(Measure):
         return 'phq9'
 
     @classmethod
+    def get_suffixes(cls):
+        return ['score']
+
+    @classmethod
     def get_cols(cls):
         return [f"{cls.get_prefix()}_{i + 1}" for i in range(9)]
 
@@ -24,5 +28,5 @@ class PHQ7(Measure):
     @classmethod
     def score(cls, df):
         score = df.sum(axis=1, skipna=False)
-        score.name = f"{cls.get_prefix()}_score"
+        score.name = f"{cls.get_prefix()}_{cls.get_suffixes()[-1]}"
         return score

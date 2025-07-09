@@ -12,6 +12,10 @@ class SOFASRating(Measure):
         return 'sofas'
 
     @classmethod
+    def get_suffixes(cls):
+        return []
+
+    @classmethod
     def get_cols(cls):
         return [f"{self.prefix}_rating"]
 
@@ -29,6 +33,10 @@ class SOFASCategory(Measure):
     @classmethod
     def get_prefix(cls):
         return 'sofas'
+
+    @classmethod
+    def get_suffixes(cls):
+        return []
 
     @classmethod
     def get_cols(cls):

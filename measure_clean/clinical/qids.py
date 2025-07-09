@@ -15,6 +15,10 @@ class QIDS(Measure):
         return 'qids'
 
     @classmethod
+    def get_suffixes(cls):
+        return ['score']
+
+    @classmethod
     def get_cols(cls):
         return [f"{cls.get_prefix()}_{i + 1}" for i in range(16)]
 
@@ -37,5 +41,8 @@ class QIDS(Measure):
             # psychomotor subscore
             np.nanmax(df[[fr"{cls.get_prefix()}_{i}" for i in range(15, 16 + 1)]], axis=1)
         )
-        score = pd.Series(np.sum(np.vstack(subscores).T, axis=1), name=f"{cls.get_prefix()}_score")
+        score = pd.Series(
+            np.sum(np.vstack(subscores).T, axis=1),
+            name=f"{cls.get_prefix()}_{cls.get_suffixes()[-1]}"
+        )
         return score

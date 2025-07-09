@@ -13,6 +13,10 @@ class WHOQOL(Measure):
         return 'whoqol'
 
     @classmethod
+    def get_suffixes(cls):
+        return [f"score_{x}" for x in ['phyhea', 'psy', 'socrel', 'env']]
+
+    @classmethod
     def get_cols(cls):
         return [f"{self.prefix}_{i + 1}" for i in range(26)]
 
@@ -35,7 +39,7 @@ class WHOQOL(Measure):
 
         scored = pd.DataFrame(
             [],
-            columns=[f"{cls.get_prefix()}_{x}" for x in ['phyhea', 'psy', 'socrel', 'env']]
+            columns=[f"{cls.get_prefix()}_{x}" for x in cls.get_suffixes()]
         )
         for score, cols in zip(scored.columns, [phyhea, psy, socrel, env]):
             cols = cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")

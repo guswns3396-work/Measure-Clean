@@ -17,6 +17,14 @@ class Measure(ABC):
 
     @classmethod
     @abstractmethod
+    def get_suffixes(cls):
+        """
+        :return: list of suffixes for score variable name
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
     def get_cols(cls):
         pass
 
@@ -148,11 +156,8 @@ class Measure(ABC):
         if mapping:
             df = df.rename(columns=mapping)
         # subset to relevant columns depending on if score already included
-        # TODO: need to implement if score does not end in _score
-        if f"{cls.get_prefix()}_score" in df.columns:
-            df = df.loc[:, [*cls.get_cols(), f"{cls.get_prefix()}_score"]]
-        else:
-            df = df.loc[:, cls.get_cols()]
+        score_cols = [f"{cls.get_prefix()}_{x}" for x in cls.get_suffixes()]
+        df = df.loc[:, [*cls.get_cols(), *df.columns[df.columns.isin(score_cols)]]]
         assert not df.columns.duplicated.any()
         # check if any outside of range
         idx = cls.check_range(df)
@@ -176,7 +181,7 @@ class Measure(ABC):
         assert df.columns.str.match(fr"^{cls.get_prefix()}_.+$").all()
         assert not df.columns.duplicated().any()
         # reorder
-        ...
+        df = df[[*cls.get_cols(), *df.columns[df.columns.isin(score_cols)]]]
         # save df
         df.to_csv(output_path)
         return df
