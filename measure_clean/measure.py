@@ -9,18 +9,10 @@ class ExceptionWithData(Exception):
         self.data = data
 
 
-class Measure(ABC):
+class Base(ABC):
     @classmethod
     @abstractmethod
     def get_prefix(cls):
-        pass
-
-    @classmethod
-    @abstractmethod
-    def get_score_suffixes(cls):
-        """
-        :return: list of suffixes for score variable name
-        """
         pass
 
     @classmethod
@@ -40,12 +32,12 @@ class Measure(ABC):
 
     @classmethod
     @abstractmethod
-    def score(cls, df):
+    def process(cls, df):
         """
-        scores the measure
-        :param df: DataFrame of data (should match the expected coding of scoring guide)
-        :return: pd.Series or pd.DataFrame of scores
-        """
+       process the data
+       :param df: DataFrame of data
+       :return: DataFrame of processed data
+       """
         pass
 
     @staticmethod
@@ -109,6 +101,26 @@ class Measure(ABC):
             raise ValueError('idx should be either pd.DataFrame of pd.Series')
         return idx
 
+
+class Measure(Base):
+    @classmethod
+    @abstractmethod
+    def get_score_suffixes(cls):
+        """
+        :return: list of suffixes for score variable name
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def score(cls, df):
+        """
+        scores the measure
+        :param df: DataFrame of data (should match the expected coding of scoring guide)
+        :return: pd.Series or pd.DataFrame of scores
+        """
+        pass
+
     @staticmethod
     def handle_duplicate(df, keep):
         """
@@ -117,6 +129,7 @@ class Measure(ABC):
         :param keep: how to handle discrepancy
         :return: pd.DataFrame of scored data without duplicate columns
         """
+
         def drop_if_same(df, keep):
             assert len(df) <= 2
             # drop one if no discrepancy
@@ -132,6 +145,7 @@ class Measure(ABC):
                         df.iloc[df.index.duplicated(keep=False), :]
                     )
             return ser
+
         df = df.T
         df = df.groupby(df.index).apply(lambda x: drop_if_same(x, keep))
         return df.T

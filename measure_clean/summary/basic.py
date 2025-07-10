@@ -1,22 +1,22 @@
-from ..measure import Measure
+from ..measure import Base
 
 import pandas as pd
 
 
-class Base(Measure):
+class Basic(Base):
     @classmethod
     def get_prefix(cls):
-        return 'base'
-
-    @classmethod
-    def get_score_suffixes(cls):
-        raise NotImplementedError("Base class does not have scores")
+        return 'basic'
 
     @classmethod
     def get_cols(cls):
         return [f"{cls.get_prefix()}_{i}" for i in [
             'sex',
             'race',
-
+            'phenotype',
+            'treatment',
+            'treatment_naive'
         ]]
 
+    @classmethod
+    def process(cls, df):
