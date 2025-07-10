@@ -12,7 +12,7 @@ class GAD7(Measure):
         return 'gad7'
 
     @classmethod
-    def get_suffixes(cls):
+    def get_score_suffixes(cls):
         return ['score']
 
     @classmethod
@@ -27,5 +27,5 @@ class GAD7(Measure):
     @classmethod
     def score(cls, df):
         score = df.sum(axis=1, skipna=False)
-        score.name = f"{cls.get_prefix()}_{cls.get_suffixes()[-1]}"
+        score.name = f"{cls.get_prefix()}_{cls.get_score_suffixes()[-1]}"
         return score

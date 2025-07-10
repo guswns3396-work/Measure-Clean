@@ -12,7 +12,7 @@ class BAIS(Measure):
         return 'bais'
 
     @classmethod
-    def get_suffixes(cls):
+    def get_score_suffixes(cls):
         return [f"score_{x}" for x in ['drive', 'fun', 'reward', 'bis']]
 
     @classmethod
@@ -38,7 +38,7 @@ class BAIS(Measure):
 
         scored = pd.DataFrame(
             [],
-            columns=[f"{cls.get_prefix()}_{x}" for x in cls.get_suffixes()]
+            columns=[f"{cls.get_prefix()}_{x}" for x in cls.get_score_suffixes()]
         )
         for score, cols in zip(scored.columns, [drive, fun, reward, bis]):
             cols = cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")

@@ -17,7 +17,7 @@ class Measure(ABC):
 
     @classmethod
     @abstractmethod
-    def get_suffixes(cls):
+    def get_score_suffixes(cls):
         """
         :return: list of suffixes for score variable name
         """
@@ -50,7 +50,7 @@ class Measure(ABC):
 
     @staticmethod
     def get_index():
-        return pd.Index(['ID', 'SES'])
+        return pd.Index(['ID', 'SES', 'AGE'])
 
     @staticmethod
     def reverse_code(df, col_num, re_str, col_min, col_max):
@@ -156,10 +156,10 @@ class Measure(ABC):
         if mapping:
             df = df.rename(columns=mapping)
         # subset to relevant columns depending on if score already included
-        if len(cls.get_suffixes()) == 0:
+        if len(cls.get_score_suffixes()) == 0:
             score_cols = []
         else:
-            score_cols = [f"{cls.get_prefix()}_{x}" for x in cls.get_suffixes()]
+            score_cols = [f"{cls.get_prefix()}_{x}" for x in cls.get_score_suffixes()]
         df = df.loc[:, [*cls.get_cols(), *df.columns[df.columns.isin(score_cols)]]]
         assert not df.columns.duplicated().any()
         # check if any outside of range
@@ -188,3 +188,6 @@ class Measure(ABC):
         # save df
         df.to_csv(output_path)
         return df
+
+
+

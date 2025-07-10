@@ -12,7 +12,7 @@ class SOFASRating(Measure):
         return 'sofas'
 
     @classmethod
-    def get_suffixes(cls):
+    def get_score_suffixes(cls):
         return []
 
     @classmethod
@@ -35,7 +35,7 @@ class SOFASCategory(Measure):
         return 'sofas'
 
     @classmethod
-    def get_suffixes(cls):
+    def get_score_suffixes(cls):
         return []
 
     @classmethod

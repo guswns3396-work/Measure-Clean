@@ -13,7 +13,7 @@ class BRISC15(Measure):
         return 'brisc15'
 
     @classmethod
-    def get_suffixes(cls):
+    def get_score_suffixes(cls):
         return [f"score_{x}" for x in ['neg', 'emo', 'soc']]
 
     @classmethod
@@ -35,9 +35,9 @@ class BRISC15(Measure):
 
         scores = pd.DataFrame(
             [],
-            columns=[f"{cls.get_prefix()}_{x}" for x in cls.get_suffixes()]
+            columns=[f"{cls.get_prefix()}_{x}" for x in cls.get_score_suffixes()]
         )
-        for score, suffix in zip(mapping, cls.get_suffixes()):
+        for score, suffix in zip(mapping, cls.get_score_suffixes()):
             cols = mapping[score]
             scores[f"{cls.get_prefix()}_{suffix}"] = df[
                 cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")

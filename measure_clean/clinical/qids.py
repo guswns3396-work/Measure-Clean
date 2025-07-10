@@ -15,7 +15,7 @@ class QIDS(Measure):
         return 'qids'
 
     @classmethod
-    def get_suffixes(cls):
+    def get_score_suffixes(cls):
         return ['score']
 
     @classmethod
@@ -43,6 +43,6 @@ class QIDS(Measure):
         )
         score = pd.Series(
             np.sum(np.vstack(subscores).T, axis=1),
-            name=f"{cls.get_prefix()}_{cls.get_suffixes()[-1]}"
+            name=f"{cls.get_prefix()}_{cls.get_score_suffixes()[-1]}"
         )
         return score

@@ -7,13 +7,13 @@ import pandas as pd
 # Patient Health Questionnaire (PHQ-9)
 # https://med.stanford.edu/fastlab/research/imapp/msrs/_jcr_content/main/accordion/accordion_content3/download_256324296/file.res/PHQ9%20id%20date%2008.03.pdf
 
-class PHQ7(Measure):
+class PHQ9(Measure):
     @classmethod
     def get_prefix(cls):
         return 'phq9'
 
     @classmethod
-    def get_suffixes(cls):
+    def get_score_suffixes(cls):
         return ['score']
 
     @classmethod
@@ -28,5 +28,5 @@ class PHQ7(Measure):
     @classmethod
     def score(cls, df):
         score = df.sum(axis=1, skipna=False)
-        score.name = f"{cls.get_prefix()}_{cls.get_suffixes()[-1]}"
+        score.name = f"{cls.get_prefix()}_{cls.get_score_suffixes()[-1]}"
         return score
