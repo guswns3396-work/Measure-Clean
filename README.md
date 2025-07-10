@@ -10,3 +10,4 @@ Package to clean datasets
   * missingno
 * html report at the end that summarizes the steps & consort, etc
 * ~ BIDS format
+* option to not have any string values
