@@ -188,6 +188,3 @@ class Measure(ABC):
         # save df
         df.to_csv(output_path)
         return df
-
-
-
