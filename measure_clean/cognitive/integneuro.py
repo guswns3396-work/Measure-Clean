@@ -78,7 +78,6 @@ class IntegNeuroCompatible(ParentNeuro):
             'wmfn',
             'wmfp',
             'wmrt',
-            'wmsd'
 
             # maze
             'emzcmpin',
