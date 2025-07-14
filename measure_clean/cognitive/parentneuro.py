@@ -190,9 +190,14 @@ class ParentNeuro(Measure):
             ),
             # trials >= 2
             cls.argwhere(
-                ~((df[f"{cls.get_prefix()}_{var_mapping['emztrlsk']}"] >= 0)
+                ~((df[f"{cls.get_prefix()}_{var_mapping['emztrlsk']}"] >= 2)
                   | (df[f"{cls.get_prefix()}_{var_mapping['emztrlsk']}"].isna()))
-            )
-
+            ),
+            # maze comp time > maze init time
+            cls.argwhere((df[f"{cls.get_prefix()}_{var_mapping['emzcompk']}"]
+                          > df[f"{cls.get_prefix()}_{var_mapping['emzinitk']}"]).rename('emzcompk')),
+            # emzerr > emzover
+            cls.argwhere((df[f"{cls.get_prefix()}_{var_mapping['emzerrk']}"]
+                          > df[f"{cls.get_prefix()}_{var_mapping['emzoverk']}"]).rename('emzerrk'))
         ]
         return pd.concat(idx, axis=0)
