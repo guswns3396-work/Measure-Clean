@@ -9,18 +9,10 @@ class ExceptionWithData(Exception):
         self.data = data
 
 
-class Measure(ABC):
+class Base(ABC):
     @classmethod
     @abstractmethod
     def get_prefix(cls):
-        pass
-
-    @classmethod
-    @abstractmethod
-    def get_score_suffixes(cls):
-        """
-        :return: list of suffixes for score variable name
-        """
         pass
 
     @classmethod
@@ -39,14 +31,65 @@ class Measure(ABC):
         pass
 
     @classmethod
-    @abstractmethod
-    def score(cls, df):
+    def process(cls, df, output_path, mapping=None, to_na=True, rev_code=False, **kwargs):
         """
-        scores the measure
-        :param df: DataFrame of data (should match the expected coding of scoring guide)
-        :return: pd.Series or pd.DataFrame of scores
-        """
-        pass
+        :param df: DataFrame of data
+        :param output_path: output path
+        :param mapping: dict mapping df column names to expected measure column names
+        :param to_na: bool whether to convert invalid values to np.nan
+        :param rev_code: bool whether to reverse code
+       """
+        df = df.copy()
+        # make sure index is in expected format
+        if not (cls.get_index() == df.index.names).all():
+            raise ValueError('Index names not expected')
+        # rename columns to match expected
+        if mapping:
+            df = df.rename(columns=mapping)
+
+        # subset to relevant columns
+        df = cls.subset_relevant_cols(df)
+
+        assert not df.columns.duplicated().any()
+        # check if any outside of range
+        idx = cls.check_range(df)
+        # convert or raise
+        if to_na:
+            for row in idx.iterrows():
+                df.loc[row['index'], row['column']] = np.nan
+        elif len(idx) > 0:
+            raise ExceptionWithData('Invalid range', idx)
+        # reverse code
+        if rev_code:
+            df = cls.reverse_code(df, kwargs['col_num'], kwargs['re_str'], kwargs['col_min'], kwargs['col_max'])
+
+        # score
+        df = cls.score_if_needed(df)
+
+        # check
+        assert df.columns.str.match(fr"^{cls.get_prefix()}_.+$").all()
+        assert not df.columns.duplicated().any()
+
+        # reorder
+        df = cls.reorder()
+
+        # save df
+        df.to_csv(output_path)
+        return df
+
+    @classmethod
+    def subset_relevant_cols(cls, df):
+        df = df.loc[:, cls.get_cols()]
+        return df
+
+    @classmethod
+    def score_if_needed(cls, df):
+        return df
+
+    @classmethod
+    def reorder(cls, df):
+        df = df.loc[:, cls.get_cols()]
+        return df
 
     @staticmethod
     def get_index():
@@ -109,14 +152,64 @@ class Measure(ABC):
             raise ValueError('idx should be either pd.DataFrame of pd.Series')
         return idx
 
+
+class Measure(Base):
+    @classmethod
+    @abstractmethod
+    def get_score_suffixes(cls):
+        """
+        :return: list of suffixes for score variable name
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def score(cls, df):
+        """
+        scores the measure
+        :param df: DataFrame of data (should match the expected coding of scoring guide)
+        :return: pd.Series or pd.DataFrame of scores
+        """
+        pass
+
+    @classmethod
+    def subset_relevant_cols(cls, df):
+        # subset to relevant columns depending on if score already included
+        if len(cls.get_score_suffixes()) == 0:
+            cls.score_cols = []
+        else:
+            cls.score_cols = [f"{cls.get_prefix()}_{x}" for x in cls.get_score_suffixes()]
+        df = df.loc[:, [*cls.get_cols(), *df.columns[df.columns.isin(cls.score_cols)]]]
+        return df
+
+    @classmethod
+    def score_if_needed(cls, df):
+        # score
+        assert isinstance(df, pd.DataFrame)
+        score = cls.score(df)
+        df = pd.concat([df[cls.get_cols()], score], axis=1)
+        assert isinstance(df, pd.DataFrame)
+        # handle potential duplicate columns due to scoring
+        if 'keep' not in kwargs:
+            kwargs['keep'] = None
+        df = cls.handle_duplicate(df, keep)
+        return df
+
+    @classmethod
+    def reorder(cls, df):
+        df = df[[*cls.get_cols(), *df.columns[df.columns.isin(cls.score_cols)]]]
+        return df
+
     @staticmethod
     def handle_duplicate(df, keep):
         """
         handles potential duplicate columns due to scoring
         :param df: pd.DataFrame of scored data
         :param keep: how to handle discrepancy
+        'first' keeps the original score, 'last' keeps newly calculated score
         :return: pd.DataFrame of scored data without duplicate columns
         """
+
         def drop_if_same(df, keep):
             assert len(df) <= 2
             # drop one if no discrepancy
@@ -132,59 +225,7 @@ class Measure(ABC):
                         df.iloc[df.index.duplicated(keep=False), :]
                     )
             return ser
+
         df = df.T
         df = df.groupby(df.index).apply(lambda x: drop_if_same(x, keep))
         return df.T
-
-    @classmethod
-    def process(cls, df, output_path, mapping=None, to_na=True, rev_code=False, keep=None, **kwargs):
-        """
-        process the data
-        :param df: DataFrame of data
-        :param output_path: output path
-        :param mapping: dict mapping df column names to expected measure column names
-        :param to_na: bool whether to convert invalid values to np.nan
-        :param rev_code: bool whether to reverse code
-        :param keep: 'first' keeps the original score, 'last' keeps newly calculated score
-        :return: DataFrame of relevant data + score
-        """
-        df = df.copy()
-        # make sure index is in expected format
-        if not (cls.get_index() == df.index.names).all():
-            raise ValueError('Index names not expected')
-        # rename columns to match expected
-        if mapping:
-            df = df.rename(columns=mapping)
-        # subset to relevant columns depending on if score already included
-        if len(cls.get_score_suffixes()) == 0:
-            score_cols = []
-        else:
-            score_cols = [f"{cls.get_prefix()}_{x}" for x in cls.get_score_suffixes()]
-        df = df.loc[:, [*cls.get_cols(), *df.columns[df.columns.isin(score_cols)]]]
-        assert not df.columns.duplicated().any()
-        # check if any outside of range
-        idx = cls.check_range(df)
-        # convert or raise
-        if to_na:
-            for row in idx.iterrows():
-                df.loc[row['index'], row['column']] = np.nan
-        elif len(idx) > 0:
-            raise ExceptionWithData('Invalid range', idx)
-        # reverse code
-        if rev_code:
-            df = cls.reverse_code(df, kwargs['col_num'], kwargs['re_str'], kwargs['col_min'], kwargs['col_max'])
-        # score
-        assert isinstance(df, pd.DataFrame)
-        score = cls.score(df)
-        df = pd.concat([df[cls.get_cols()], score], axis=1)
-        assert isinstance(df, pd.DataFrame)
-        # handle potential duplicate columns due to scoring
-        df = cls.handle_duplicate(df, keep)
-        # check
-        assert df.columns.str.match(fr"^{cls.get_prefix()}_.+$").all()
-        assert not df.columns.duplicated().any()
-        # reorder
-        df = df[[*cls.get_cols(), *df.columns[df.columns.isin(score_cols)]]]
-        # save df
-        df.to_csv(output_path)
-        return df
