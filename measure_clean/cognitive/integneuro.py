@@ -93,7 +93,6 @@ class IntegNeuroCompatible(ParentNeuro):
     @classmethod
     def get_var_mapping(cls):
         mapping = {
-            # TODO
             'tdomnk': 'tapdomn',
             'tdomsdk': 'tapdomsd',
             'chlrrtav': 'ch_avrt',
