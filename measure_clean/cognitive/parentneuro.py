@@ -66,8 +66,11 @@ class ParentNeuro(Measure):
             ),
 
             # verbal recall
-            # recalled > 0
-            # TODO
+            # recalled >= 0
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['ctmrec13']}"] >= 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['ctmrec13']}"].isna()))
+            ),
 
             # explicit emotion
             # check accuracy
@@ -92,45 +95,104 @@ class ParentNeuro(Measure):
                 ~((df[[f"{cls.get_prefix()}_{var_mapping['vcrtne']}{i}" for i in ['', '2']]] > 0)
                   | (df[[f"{cls.get_prefix()}_{var_mapping['vcrtne']}{i}" for i in ['', '2']]].isna()))
             ),
-            # check score > 0
+            # check score >= 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['vi_sco']}{i}" for i in [1, 2]]] > 0)
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['vi_sco']}{i}" for i in [1, 2]]] >= 0)
                   | (df[[f"{cls.get_prefix()}_{var_mapping['vi_sco']}{i}" for i in [1, 2]]].isna()))
             ),
-            # check err > 0
+            # check err >= 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['vi_err']}{i}" for i in [1, 2]]] > 0)
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['vi_err']}{i}" for i in [1, 2]]] >= 0)
                   | (df[[f"{cls.get_prefix()}_{var_mapping['vi_err']}{i}" for i in [1, 2]]].isna()))
             ),
 
-            # TODO
-
             # switching of attention
             # connection time > 0
+            cls.argwhere(
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['scavr0t']}{i}" for i in [1, 2]]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['scavr0t']}{i}" for i in [1, 2]]].isna()))
+            ),
             # duration > 0
+            cls.argwhere(
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['esoadur']}{i}" for i in [1, 2]]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['esoadur']}{i}" for i in [1, 2]]].isna()))
+            ),
             # 0 <= errors <= 25
+            cls.argwhere(
+                ~(((df[[f"{cls.get_prefix()}_{var_mapping['swoaerr']}{i}" for i in [1, 2]]] >= 0)
+                  & (df[[f"{cls.get_prefix()}_{var_mapping['swoaerr']}{i}" for i in [1, 2]]] <= 25))
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['swoaerr']}{i}" for i in [1, 2]]].isna()))
+            ),
 
             # go no go
             # rt > 0
-            # fp, fn > 0
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['g2avrtk']}"] > 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['g2avrtk']}"].isna()))
+            ),
+            # fp, fn >= 0
+            cls.argwhere(
+                ~((df[[f"{cls.get_prefix()}_{var_mapping[i]}" for i in ['g2fnk', 'g2fpk']]] >= 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping[i]}" for i in ['g2fnk', 'g2fpk']]].isna()))
+            ),
             # sd > 0
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['g2sdrtk']}"] > 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['g2sdrtk']}"].isna()))
+            ),
 
             # delayed recall
-            # recalled > 0
+            # recalled >= 0
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['ctmrec4']}"] >= 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['ctmrec4']}"].isna()))
+            ),
 
             # implicit emotion
             # rt > 0
+            cls.argwhere(
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['dgtcrt']}{i}" for i in emotions]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['dgtcrt']}{i}" for i in emotions]].isna()))
+            ),
 
             # working memory
-            # fn, fp > 0
+            # fn, fp >= 0
+            cls.argwhere(
+                ~((df[[f"{cls.get_prefix()}_{var_mapping[i]}" for i in ['wmfnk', 'wmfpk']]] >= 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping[i]}" for i in ['wmfnk', 'wmfpk']]].isna()))
+            ),
             # rt > 0
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['wmrtk']}"] > 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['wmrtk']}"].isna()))
+            ),
 
             # maze
             # comp time > 0
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['emzcompk']}"] > 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['emzcompk']}"].isna()))
+            ),
             # init time > 0
-            # over > 0
-            # err > 0
-            # trials > 2
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['emzinitk']}"] > 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['emzinitk']}"].isna()))
+            ),
+            # over >= 0
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['emzoverk']}"] >= 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['emzoverk']}"].isna()))
+            ),
+            # err >= 0
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['emzerrk']}"] >= 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['emzerrk']}"].isna()))
+            ),
+            # trials >= 2
+            cls.argwhere(
+                ~((df[f"{cls.get_prefix()}_{var_mapping['emztrlsk']}"] >= 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['emztrlsk']}"].isna()))
+            )
 
         ]
         return pd.concat(idx, axis=0)
