@@ -97,6 +97,7 @@ class IntegNeuroCompatible(ParentNeuro):
             'tdomnk': 'tapdomn',
             'tdomsdk': 'tapdomsd',
             'chlrrtav': 'ch_avrt',
+            'ctmsco13': 'memtot14',
             'getcp': 'getcp',
             'getcrt': 'getcrt',
             'digitsp': 'digitsp',
@@ -104,19 +105,25 @@ class IntegNeuroCompatible(ParentNeuro):
             'vcrtne': 'vcrtne',
             'vi_sco': 'vi_sco',
             'vi_err': 'vi_err',
+            'scavr0t': 'scavr0t',
+            'esoadur': 'swoadur',
+            'esoaerr': 'swoaerr',
+            'g2avrtk': 'gngavrt',
+            'g2fnk': 'gngfn',
+            'g2fpk': 'gngfp',
+            'g2sdrtk': 'gngsdrt',
+            'ctmrec4': 'memtot7',
+            'dgtcrt': 'cdsgcrt',
+            'wmfnk': 'wmfn',
+            'wmfpk': 'wmfp',
+            'wmrtk': 'wmrt',
+            'emzcompk': 'emzcmpin',
+            'emzinitk': 'emziniin',
+            'emzoverk': 'emzovrin',
+            'emzerrk': 'emzovrin',
+            'emztrlsk': 'emztrlin'
         }
         return mapping
-
-    @classmethod
-    def check_range(cls, df):
-        idx = [
-            # TODO
-        ]
-        # TODO
-        # maze comp time > maze init time
-        # emzerr > emzover
-        idx = pd.concat([super().check_range(df), idx], axis=1)
-        return idx
 
     @classmethod
     def score(cls, df):
