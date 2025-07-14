@@ -68,8 +68,8 @@ class ParentNeuro(Measure):
             # verbal recall
             # recalled >= 0
             cls.argwhere(
-                ~((df[f"{cls.get_prefix()}_{var_mapping['ctmrec13']}"] >= 0)
-                  | (df[f"{cls.get_prefix()}_{var_mapping['ctmrec13']}"].isna()))
+                ~((df[f"{cls.get_prefix()}_{var_mapping['ctmsco13']}"] >= 0)
+                  | (df[f"{cls.get_prefix()}_{var_mapping['ctmsco13']}"].isna()))
             ),
 
             # explicit emotion
@@ -119,9 +119,9 @@ class ParentNeuro(Measure):
             ),
             # 0 <= errors <= 25
             cls.argwhere(
-                ~(((df[[f"{cls.get_prefix()}_{var_mapping['swoaerr']}{i}" for i in [1, 2]]] >= 0)
-                  & (df[[f"{cls.get_prefix()}_{var_mapping['swoaerr']}{i}" for i in [1, 2]]] <= 25))
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['swoaerr']}{i}" for i in [1, 2]]].isna()))
+                ~(((df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]] >= 0)
+                  & (df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]] <= 25))
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]].isna()))
             ),
 
             # go no go
