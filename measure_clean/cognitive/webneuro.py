@@ -1,0 +1,151 @@
+from ..measure import Measure
+from .parentneuro import ParentNeuro
+
+import pandas as pd
+
+
+# https://www.tandfonline.com/doi/full/10.1080/13803391003596496#appendixes
+
+class WebNeuroCompatible(ParentNeuro):
+    """
+    webneuro measure that have variables corresponding to
+    integneuro counterpart
+    """
+
+    @classmethod
+    def get_prefix(cls):
+        return 'webneuro'
+
+    @classmethod
+    def get_score_suffixes(cls):
+        return []
+
+    @classmethod
+    def get_cols(cls):
+        emotions = cls.get_emotions()
+        suffixes = [
+            # motor tapping
+            'tdomnk',
+            'tdomsdk',
+
+            # choice reaction
+            'chlrrtav',
+
+            # verbal recall
+            'ctmsco13',
+
+            # explicit emotion
+            *[f'getcp{i}' for i in emotions],
+            *[f'getcrt{i}' for i in emotions],
+
+            # digt span
+            'digitsp',
+            'digitot',
+
+            # verbal interference
+            'vi_err1',
+            'vi_err2',
+            'vi_sco1',
+            'vi_sco2',
+            'vcrtne',
+            'vcrtne2',
+            'vi_difrt',
+
+            # switching of attention
+            'scavr0t1',
+            'scavr0t2',
+            'esoadur1',
+            'esoadur2',
+            'esoaerr1',
+            'esoaerr2',
+
+            # go no go
+            'g2avrtk',
+            'g2fnk',
+            'g2fpk',
+            'g2sdrtk',
+            'g2errk',
+
+            # delayed verbal recall
+            'ctmrec4',
+
+            # implicit emotion
+            *[f'dgtcrtn{i}' for i in emotions[:-1]],
+            *[f'dgtcrt{i}' for i in emotions],
+
+            # working memory
+            'wmfnk',
+            'wmfpk',
+            'wmrtk',
+            'wmacck'
+
+            # maze
+            'emzcompk',
+            'emzinitk',
+            'emzoverk',
+            'emzerrk',
+            'emztrlsk'
+        ]
+        return [f"{cls.get_prefix()}_{i}" for i in suffixes] + \
+               [f"{cls.get_prefix()}_{i}_norm" for i in suffixes]
+
+    @classmethod
+    def get_var_mapping(cls):
+        mapping = [
+            'tdomnk',
+            'tdomsdk',
+            'chlrrtav',
+            'ctmsco13',
+            'getcp',
+            'getcrt',
+            'digitsp',
+            'digitot',
+            'vcrtne',
+            'vi_sco',
+            'vi_err',
+            'vi_difrt',
+            'scavr0t',
+            'esoadur',
+            'esoaerr',
+            'g2avrtk',
+            'g2fnk',
+            'g2fpk',
+            'g2sdrtk',
+            'ctmrec4',
+            'dgtcrt',
+            'wmfnk',
+            'wmfpk',
+            'wmrtk',
+            'emzcompk',
+            'emzinitk',
+            'emzoverk',
+            'emzerrk',
+            'emztrlsk'
+        ]
+        mapping = {k: k for k in mapping}
+        return mapping
+
+    @classmethod
+    def score(cls, df):
+        """
+        verifies summary measures (variable that reference other variables)
+        :param df: pd.DataFrame of data
+        :return: pd.DataFrame of scored summary variables
+        """
+        emotions = cls.get_emotions()
+        scores = [
+            # verbal interference
+            (df[f"{cls.get_prefix()}_vcrtne2"] - df[f"{cls.get_prefix()}_vcrtne"]) \
+            .rename(f"{cls.get_prefix()}_vi_difrt"),
+            # go no go
+            df[[f"{cls.get_prefix()}_g2{i}k" for i in ['fn', 'fp']]].sum(axis=1) \
+            .rename(f"{cls.get_prefix()}_g2errk"),
+            # implicit emotion
+            (df[[f"{cls.get_prefix()}_dgtcrt{i}" for i in emotions[-1]]] - df[f"{cls.get_prefix()}_dgtcrtN"]) \
+            .rename(columns=[f"{cls.get_prefix()}_dgtcn{i}" for i in emotions[-1]]),
+            # working memory
+            df[[f"{cls.get_prefix()}_wm{i}k" for i in ['fn', 'fp']]].sum(axis=1) \
+            .rename(f"{cls.get_prefix()}_wmacck"),
+        ]
+        scores = pd.concat(scores, axis=1)
+        return scores
