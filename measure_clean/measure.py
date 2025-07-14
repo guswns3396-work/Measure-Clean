@@ -54,6 +54,7 @@ class Base(ABC):
         assert not df.columns.duplicated().any()
         # check if any outside of range
         idx = cls.check_range(df)
+        idx = idx.drop_duplicates()
         # convert or raise
         if to_na == 'ignore':
             pass
