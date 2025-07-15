@@ -36,7 +36,7 @@ class WebNeuroCompatible(ParentNeuro):
 
             # explicit emotion
             *[f'getcp{i}' for i in emotions],
-            *[f'getcrt{i}' for i in emotions],
+            *[f'getrt{i}' for i in emotions],
 
             # digt span
             'digitsp',
@@ -97,7 +97,7 @@ class WebNeuroCompatible(ParentNeuro):
             'chlrrtav',
             'ctmsco13',
             'getcp',
-            'getcrt',
+            'getrt',
             'digitsp',
             'digitot',
             'vcrtne',

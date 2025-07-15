@@ -36,7 +36,7 @@ class IntegNeuroCompatible(ParentNeuro):
 
             # explicit emotion
             *[f'getcp{i}' for i in emotions],
-            *[f'getcrt{i}' for i in emotions],
+            *[f'getrt{i}' for i in emotions],
 
             # digt span
             'digitot',
@@ -97,7 +97,7 @@ class IntegNeuroCompatible(ParentNeuro):
             'chlrrtav': 'ch_avrt',
             'ctmsco13': 'memtot14',
             'getcp': 'getcp',
-            'getcrt': 'getcrt',
+            'getrt': 'getrt',
             'digitsp': 'digitsp',
             'digitot': 'digitot',
             'vcrtne': 'vcrtne',

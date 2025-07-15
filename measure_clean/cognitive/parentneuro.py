@@ -1,5 +1,5 @@
 from ..measure import Measure
-
+from abc import abstractmethod
 import pandas as pd
 
 
@@ -79,8 +79,8 @@ class ParentNeuro(Measure):
             ),
             # check rt > 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['getcrt']}{i}" for i in emotions]] > 0)
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['getcrt']}{i}" for i in emotions]].isna()))
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['getrt']}{i}" for i in emotions]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['getrt']}{i}" for i in emotions]].isna()))
             ),
 
             # digit span
