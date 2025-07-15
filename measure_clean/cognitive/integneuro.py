@@ -122,28 +122,3 @@ class IntegNeuroCompatible(ParentNeuro):
             'emztrlsk': 'emztrlin'
         }
         return mapping
-
-    @classmethod
-    def score(cls, df):
-        """
-        verifies summary measures (variable that reference other variables)
-        :param df: pd.DataFrame of data
-        :return: pd.DataFrame of scored summary variables
-        """
-        emotions = cls.get_emotions()
-        scores = [
-            # verbal interference
-            (df[f"{cls.get_prefix()}_vcrtne2"] - df[f"{cls.get_prefix()}_vcrtne"]) \
-            .rename(f"{cls.get_prefix()}_vi_difrt"),
-            # go no go
-            df[[f"{cls.get_prefix()}_gng{i}" for i in ['fn', 'fp']]].sum(axis=1) \
-            .rename(f"{cls.get_prefix()}_gngerr"),
-            # implicit emotion
-            (df[[f"{cls.get_prefix()}_cdsgcrt{i}" for i in emotions[-1]]] - df[f"{cls.get_prefix()}_cdsgcrtN"]) \
-            .rename(columns=[f"{cls.get_prefix()}_cdsgcn{i}" for i in emotions[-1]]),
-            # working memory
-            df[[f"{cls.get_prefix()}_wm{i}" for i in ['fn', 'fp']]].sum(axis=1) \
-            .rename(f"{cls.get_prefix()}_wmerr"),
-        ]
-        scores = pd.concat(scores, axis=1)
-        return scores

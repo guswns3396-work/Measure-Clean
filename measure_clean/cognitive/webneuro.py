@@ -124,28 +124,3 @@ class WebNeuroCompatible(ParentNeuro):
         ]
         mapping = {k: k for k in mapping}
         return mapping
-
-    @classmethod
-    def score(cls, df):
-        """
-        verifies summary measures (variable that reference other variables)
-        :param df: pd.DataFrame of data
-        :return: pd.DataFrame of scored summary variables
-        """
-        emotions = cls.get_emotions()
-        scores = [
-            # verbal interference
-            (df[f"{cls.get_prefix()}_vcrtne2"] - df[f"{cls.get_prefix()}_vcrtne"]) \
-            .rename(f"{cls.get_prefix()}_vi_difrt"),
-            # go no go
-            df[[f"{cls.get_prefix()}_g2{i}k" for i in ['fn', 'fp']]].sum(axis=1) \
-            .rename(f"{cls.get_prefix()}_g2errk"),
-            # implicit emotion
-            (df[[f"{cls.get_prefix()}_dgtcrt{i}" for i in emotions[-1]]] - df[f"{cls.get_prefix()}_dgtcrtN"]) \
-            .rename(columns=[f"{cls.get_prefix()}_dgtcn{i}" for i in emotions[-1]]),
-            # working memory
-            df[[f"{cls.get_prefix()}_wm{i}k" for i in ['fn', 'fp']]].sum(axis=1) \
-            .rename(f"{cls.get_prefix()}_wmacck"),
-        ]
-        scores = pd.concat(scores, axis=1)
-        return scores

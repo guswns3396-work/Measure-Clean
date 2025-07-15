@@ -151,8 +151,8 @@ class ParentNeuro(Measure):
             # implicit emotion
             # rt > 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['dgtcrt']}{i}" for i in emotions]] > 0)
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['dgtcrt']}{i}" for i in emotions]].isna()))
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}" for i in emotions]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}" for i in emotions]].isna()))
             ),
 
             # working memory
@@ -201,3 +201,30 @@ class ParentNeuro(Measure):
                           > df[f"{cls.get_prefix()}_{var_mapping['emzoverk']}"]).rename('emzerrk'))
         ]
         return pd.concat(idx, axis=0)
+
+    @classmethod
+    def score(cls, df):
+        """
+        verifies summary measures (variable that reference other variables)
+        :param df: pd.DataFrame of data
+        :return: pd.DataFrame of scored summary variables
+        """
+        emotions = cls.get_emotions()
+        var_mapping = cls.get_var_mapping()
+        scores = [
+            # verbal interference
+            (df[f"{cls.get_prefix()}_{var_mapping['vcrtne2']}"] - df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}"]) \
+            .rename(f"{cls.get_prefix()}_{var_mapping['vi_difrt']}"),
+            # go no go
+            df[[f"{cls.get_prefix()}_{var_mapping['g2' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1) \
+            .rename(f"{cls.get_prefix()}_{var_mapping['g2errk']}"),
+            # implicit emotion
+            (df[[f"{cls.get_prefix()}_{var_mapping['dgtcrt' + i]}" for i in emotions[-1]]]
+             - df[f"{cls.get_prefix()}_{var_mapping['dgtcrtN']}"]) \
+            .rename(columns=[f"{cls.get_prefix()}_{var_mapping['dgtcn' + i]}" for i in emotions[-1]]),
+            # working memory
+            df[[f"{cls.get_prefix()}_{var_mapping['wm' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1) \
+            .rename(f"{cls.get_prefix()}_{var_mapping['wmacck']}"),
+        ]
+        scores = pd.concat(scores, axis=1)
+        return scores
