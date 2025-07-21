@@ -55,7 +55,9 @@ class Base(ABC):
         # check if any outside of range
         idx = cls.check_range(df)
         # convert or raise
-        if to_na:
+        if to_na == 'ignore':
+            pass
+        elif to_na:
             for _, row in idx.iterrows():
                 df.loc[row['index'], row['column']] = np.nan
         elif len(idx) > 0:
@@ -124,9 +126,10 @@ class Base(ABC):
         return cols[cols.str.extract(re_str)[0].astype(float).isin(num)]
 
     @staticmethod
-    def is_valid_discrete(df, vals):
+    def is_invalid_discrete(df, vals):
         """
         checks whether values in df are within range of discrete values or is missing
+        returns true if invalid
         :param df: pd.DataFrame or pd.Series
         :param vals: list of acceptable values
         :return: pd.DataFrame or pd.Series of dtype Bool

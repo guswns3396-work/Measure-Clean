@@ -28,7 +28,7 @@ class HDRS(Measure):
             cols = cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")
             idx.append(
                 cls.argwhere(
-                    cls.is_valid_discrete(df[cols], [i for i in vals])
+                    cls.is_invalid_discrete(df[cols], [i for i in vals])
                 )
             )
         idx = pd.concat(idx, axis=0)

@@ -35,7 +35,7 @@ class WHOQOL(Measure):
     @classmethod
     def check_range(cls, df):
         vals = [i for i in range(1, 5 + 1)]
-        return cls.argwhere(cls.is_valid_discrete(df, vals))
+        return cls.argwhere(cls.is_invalid_discrete(df, vals))
 
     @classmethod
     def score(cls, df):
