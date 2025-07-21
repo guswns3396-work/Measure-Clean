@@ -18,28 +18,28 @@ class ParentNeuro(Measure):
         return "ADFHSN"
 
     @classmethod
-    def is_valid_digitsp(cls, ser):
+    def is_invalid_digitsp(cls, ser):
         """
         :param ser: pd.Series for digitsp
         :return: pd.Series of dtype Bool for valid values
         """
-        return cls.is_valid_discrete(ser, [i for i in range(3, 9 + 1)])
+        return cls.is_invalid_discrete(ser, [i for i in range(3, 9 + 1)])
 
     @classmethod
-    def is_valid_digitot(cls, ser):
+    def is_invalid_digitot(cls, ser):
         """
         :param ser: pd.Series for digitot
         :return: pd.Series of dtype Bool for valid values
         """
-        return cls.is_valid_discrete(ser, [i for i in range(0, 14 + 1)])
+        return cls.is_invalid_discrete(ser, [i for i in range(0, 14 + 1)])
 
     @classmethod
-    def is_valid_perc(cls, df):
+    def is_invalid_perc(cls, df):
         """
         :param df: pd.Series or pd.DataFrame of percent variables
         :return: pd.Series or pd.DataFrame of dtype Bool for valid values
         """
-        return ((df <= 100) & (df >= 0)) | df.isna()
+        return ~(((df <= 100) & (df >= 0)) | df.isna())
 
     @classmethod
     def check_range(cls, df):
@@ -75,7 +75,7 @@ class ParentNeuro(Measure):
             # explicit emotion
             # check accuracy
             cls.argwhere(
-                cls.is_valid_perc(df[[f"{cls.get_prefix()}_{var_mapping['getcp']}{i}" for i in emotions]])
+                cls.is_invalid_perc(df[[f"{cls.get_prefix()}_{var_mapping['getcp']}{i}" for i in emotions]])
             ),
             # check rt > 0
             cls.argwhere(
@@ -85,9 +85,9 @@ class ParentNeuro(Measure):
 
             # digit span
             # check span range
-            cls.argwhere(cls.is_valid_digitsp(df[f"{cls.get_prefix()}_{var_mapping['digitsp']}"])),
+            cls.argwhere(cls.is_invalid_digitsp(df[f"{cls.get_prefix()}_{var_mapping['digitsp']}"])),
             # check total range
-            cls.argwhere(cls.is_valid_digitot(df[f"{cls.get_prefix()}_{var_mapping['digitot']}"])),
+            cls.argwhere(cls.is_invalid_digitot(df[f"{cls.get_prefix()}_{var_mapping['digitot']}"])),
 
             # verbal interference
             # check rt > 0
