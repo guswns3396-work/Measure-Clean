@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
@@ -55,13 +56,13 @@ class Base(ABC):
         idx = cls.check_range(df)
         # convert or raise
         if to_na:
-            for row in idx.iterrows():
+            for _, row in idx.iterrows():
                 df.loc[row['index'], row['column']] = np.nan
         elif len(idx) > 0:
             raise ExceptionWithData('Invalid range', idx)
         # reverse code
         if rev_code:
-            df = cls.reverse_code(df, kwargs['col_num'], kwargs['re_str'], kwargs['col_min'], kwargs['col_max'])
+            df = cls.reverse_code(df, kwargs['col_num'], cls.get_restr(), cls.get_min(), cls.get_max())
 
         # score
         df = cls.score_if_needed(df)
@@ -71,10 +72,11 @@ class Base(ABC):
         assert not df.columns.duplicated().any()
 
         # reorder
-        df = cls.reorder()
+        df = cls.reorder(df)
 
         # save df
-        df.to_csv(output_path)
+        if output_path is not None:
+            df.to_csv(os.path.join(output_path, f"{cls.get_prefix()}.csv"))
         return df
 
     @classmethod
@@ -135,21 +137,15 @@ class Base(ABC):
     def argwhere(df):
         """
         returns list of (index, colname) tuples where df is True
-        :param df: pd.DataFrame or pd.Series of dtype Bool
+        :param df: pd.DataFrame dtype Bool
         :return: pd.DataFrame where each row indicates indices where df is True
         """
+        if isinstance(df, pd.Series):
+            df = df.to_frame()
         idx = np.argwhere(df)
-        # dataframe
-        if idx.shape[-1] == 2:
-            idx = pd.DataFrame(idx, columns=['index', 'column'])
-            idx['index'] = idx['index'].map(lambda x: df.index[x])
-            idx['column'] = idx['column'].map(lambda x: df.columns[x])
-        # series
-        elif idx.shape[-1] == 1:
-            idx = pd.DataFrame(idx, columns=['index'])
-            idx['column'] = df.name
-        else:
-            raise ValueError('idx should be either pd.DataFrame of pd.Series')
+        idx = pd.DataFrame(idx, columns=['index', 'column'])
+        idx['index'] = idx['index'].map(lambda x: df.index[x])
+        idx['column'] = idx['column'].map(lambda x: df.columns[x])
         return idx
 
 
@@ -183,7 +179,7 @@ class Measure(Base):
         return df
 
     @classmethod
-    def score_if_needed(cls, df):
+    def score_if_needed(cls, df, **kwargs):
         # score
         assert isinstance(df, pd.DataFrame)
         score = cls.score(df)
@@ -192,7 +188,7 @@ class Measure(Base):
         # handle potential duplicate columns due to scoring
         if 'keep' not in kwargs:
             kwargs['keep'] = None
-        df = cls.handle_duplicate(df, keep)
+        df = cls.handle_duplicate(df, keep=kwargs['keep'])
         return df
 
     @classmethod
