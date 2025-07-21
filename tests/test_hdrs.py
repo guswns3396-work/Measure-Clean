@@ -81,16 +81,18 @@ class TestProcess(unittest.TestCase):
         df = pd.concat([df1, df2], axis=1)
         df['ID'] = 1
         df['SES'] = 2
-        df = df.set_index(['ID', 'SES'])
+        df['AGE'] = 3
+        df = df.set_index(['ID', 'SES', 'AGE'])
 
         target = pd.concat([df1, df2], axis=1)
         target['ID'] = 1
         target['SES'] = 2
-        target = target.set_index(['ID', 'SES'])
+        target['AGE'] = 3
+        target = target.set_index(['ID', 'SES', 'AGE'])
 
         source = self.TestMeasure.process(df, None)
         target[
-            f"{self.TestMeasure.get_prefix()}_{self.TestMeasure.get_suffixes()[-1]}"
+            f"{self.TestMeasure.get_prefix()}_{self.TestMeasure.get_score_suffixes()[-1]}"
         ] = [34, 19, 25, 27, 26]
 
         self.assertTrue((source.sort_index(axis=1) == target.sort_index(axis=1)).all().all())
