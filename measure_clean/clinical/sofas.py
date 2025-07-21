@@ -17,11 +17,11 @@ class SOFASRating(Measure):
 
     @classmethod
     def get_cols(cls):
-        return [f"{self.prefix}_rating"]
+        return [f"{cls.get_prefix()}_rating"]
 
     @classmethod
     def check_range(cls, df):
-        vals = [i in range(0, 100 + 1)]
+        vals = [i for i in range(0, 100 + 1)]
         return cls.argwhere(cls.is_valid_discrete(df, vals))
 
     @classmethod
@@ -40,11 +40,11 @@ class SOFASCategory(Measure):
 
     @classmethod
     def get_cols(cls):
-        return [f"{self.prefix}_category"]
+        return [f"{cls.get_prefix()}_category"]
 
     @classmethod
     def check_range(cls, df):
-        vals = [i in range(0, 10 + 1)]
+        vals = [i for i in range(0, 10 + 1)]
         return cls.argwhere(cls.is_valid_discrete(df, vals))
 
     @classmethod

@@ -18,11 +18,11 @@ class ERQ(Measure):
 
     @classmethod
     def get_cols(cls):
-        return [f"{self.prefix}_{i + 1}" for i in range(10)]
+        return [f"{cls.get_prefix()}_{i + 1}" for i in range(10)]
 
     @classmethod
     def check_range(cls, df):
-        vals = [i in range(1, 7 + 1)]
+        vals = [i for i in range(1, 7 + 1)]
         return cls.argwhere(cls.is_valid_discrete(df, vals))
 
     @classmethod

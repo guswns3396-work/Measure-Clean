@@ -20,8 +20,20 @@ class BAIS(Measure):
         return [f"{cls.get_prefix()}_{i + 1}" for i in range(20)]
 
     @classmethod
+    def get_restr(cls):
+        return r"bais_(\d+)"
+
+    @classmethod
+    def get_min(cls):
+        return 1
+
+    @classmethod
+    def get_max(cls):
+        return 4
+
+    @classmethod
     def check_range(cls, df):
-        vals = [i in range(1, 4 + 1)]
+        vals = [i for i in range(1, 4 + 1)]
         return cls.argwhere(cls.is_valid_discrete(df, vals))
 
     @classmethod
@@ -41,6 +53,6 @@ class BAIS(Measure):
             columns=[f"{cls.get_prefix()}_{x}" for x in cls.get_score_suffixes()]
         )
         for score, cols in zip(scored.columns, [drive, fun, reward, bis]):
-            cols = cls.subset_cols_num(df.columns, cols, fr"{cls.get_prefix()}_(\d+)")
+            cols = cls.subset_cols_num(df.columns, cols, cls.get_restr())
             scored[score] = df[cols].sum(axis=1, skipna=False)
         return scored

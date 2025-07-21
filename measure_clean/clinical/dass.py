@@ -22,7 +22,7 @@ class DASS42(Measure):
 
     @classmethod
     def check_range(cls, df):
-        vals = [i in range(0, 3 + 1)]
+        vals = [i for i in range(0, 3 + 1)]
         return cls.argwhere(cls.is_valid_discrete(df, vals))
 
     @classmethod

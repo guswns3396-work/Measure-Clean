@@ -18,18 +18,30 @@ class WHOQOL(Measure):
 
     @classmethod
     def get_cols(cls):
-        return [f"{self.prefix}_{i + 1}" for i in range(26)]
+        return [f"{cls.get_prefix()}_{i + 1}" for i in range(26)]
+
+    @classmethod
+    def get_restr(cls):
+        return cls.get_prefix() + r"_(\d+)"
+
+    @classmethod
+    def get_min(cls):
+        return 1
+
+    @classmethod
+    def get_max(cls):
+        return 5
 
     @classmethod
     def check_range(cls, df):
-        vals = [i in range(1, 5 + 1)]
+        vals = [i for i in range(1, 5 + 1)]
         return cls.argwhere(cls.is_valid_discrete(df, vals))
 
     @classmethod
     def score(cls, df):
         # reverse code for scoring
         rev_cols = [3, 4, 26]
-        df = cls.reverse_code(df, rev_cols, cls.get_restr(), 1, 5)
+        df = cls.reverse_code(df, rev_cols, cls.get_restr(), cls.get_min(), cls.get_max())
 
         # score
         phyhea = [3, 4, 10, 15, 16, 17, 18]
