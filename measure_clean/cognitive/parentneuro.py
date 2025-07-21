@@ -120,7 +120,7 @@ class ParentNeuro(Measure):
             # 0 <= errors <= 25
             cls.argwhere(
                 ~(((df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]] >= 0)
-                  & (df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]] <= 25))
+                   & (df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]] <= 25))
                   | (df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]].isna()))
             ),
 
@@ -213,15 +213,18 @@ class ParentNeuro(Measure):
         var_mapping = cls.get_var_mapping()
         scores = [
             # verbal interference
-            (df[f"{cls.get_prefix()}_{var_mapping['vcrtne2']}"] - df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}"]) \
+            (df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}2"] - df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}"]) \
             .rename(f"{cls.get_prefix()}_{var_mapping['vi_difrt']}"),
             # go no go
             df[[f"{cls.get_prefix()}_{var_mapping['g2' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1) \
             .rename(f"{cls.get_prefix()}_{var_mapping['g2errk']}"),
             # implicit emotion
-            (df[[f"{cls.get_prefix()}_{var_mapping['dgtcrt' + i]}" for i in emotions[-1]]]
-             - df[f"{cls.get_prefix()}_{var_mapping['dgtcrtN']}"]) \
-            .rename(columns=[f"{cls.get_prefix()}_{var_mapping['dgtcn' + i]}" for i in emotions[-1]]),
+            (df[[f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}" for i in emotions[:-1]]].apply(
+                lambda s: s - df[f"{cls.get_prefix()}_{var_mapping['dgtrt']}N"]
+            )).rename(columns={
+                f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}": f"{cls.get_prefix()}_{var_mapping['dgtcn']}{i}"
+                for i in emotions[-1]
+            }),
             # working memory
             df[[f"{cls.get_prefix()}_{var_mapping['wm' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1) \
             .rename(f"{cls.get_prefix()}_{var_mapping['wmacck']}"),

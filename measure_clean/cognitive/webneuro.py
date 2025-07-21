@@ -71,13 +71,13 @@ class WebNeuroCompatible(ParentNeuro):
 
             # implicit emotion
             *[f'dgtcrtn{i}' for i in emotions[:-1]],
-            *[f'dgtcrt{i}' for i in emotions],
+            *[f'dgtrt{i}' for i in emotions],
 
             # working memory
             'wmfnk',
             'wmfpk',
             'wmrtk',
-            'wmacck'
+            'wmacck',
 
             # maze
             'emzcompk',
@@ -110,11 +110,14 @@ class WebNeuroCompatible(ParentNeuro):
             'g2avrtk',
             'g2fnk',
             'g2fpk',
+            'g2errk',
             'g2sdrtk',
             'ctmrec4',
-            'dgtcrt',
+            'dgtrt',
+            'dgtcn',
             'wmfnk',
             'wmfpk',
+            'wmacck',
             'wmrtk',
             'emzcompk',
             'emzinitk',
