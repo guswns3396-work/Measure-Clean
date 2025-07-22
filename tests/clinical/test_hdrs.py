@@ -1,7 +1,6 @@
 import unittest
 import numpy as np
 import pandas as pd
-from measure_clean.measure import Measure
 from measure_clean.clinical.hdrs import HDRS21, HDRS17
 
 

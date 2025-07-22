@@ -36,8 +36,8 @@ class Summary(Base):
     @classmethod
     def check_range(cls, df):
         idx = [
-            cls.argwhere(cls.is_valid_discrete(df[f"{cls.get_prefix()}_sex"], ['M', 'F', 'O'])),
-            cls.argwhere(cls.is_valid_discrete(
+            cls.argwhere(cls.is_invalid_discrete(df[f"{cls.get_prefix()}_sex"], ['M', 'F', 'O'])),
+            cls.argwhere(cls.is_invalid_discrete(
                 df[[f"{cls.get_prefix()}_{x}" for x in [
                     'treatment_naive',
                     'current_medication',

@@ -54,6 +54,7 @@ class Base(ABC):
         assert not df.columns.duplicated().any()
         # check if any outside of range
         idx = cls.check_range(df)
+        idx = idx.drop_duplicates()
         # convert or raise
         if to_na == 'ignore':
             pass
@@ -67,7 +68,10 @@ class Base(ABC):
             df = cls.reverse_code(df, kwargs['col_num'], cls.get_restr(), cls.get_min(), cls.get_max())
 
         # score
-        df = cls.score_if_needed(df)
+        if 'keep' in kwargs:
+            df = cls.score_if_needed(df, keep=kwargs['keep'])
+        else:
+            df = cls.score_if_needed(df, keep=None)
 
         # check
         assert df.columns.str.match(fr"^{cls.get_prefix()}_.+$").all()
@@ -87,7 +91,7 @@ class Base(ABC):
         return df
 
     @classmethod
-    def score_if_needed(cls, df):
+    def score_if_needed(cls, df, keep):
         return df
 
     @classmethod
@@ -182,16 +186,14 @@ class Measure(Base):
         return df
 
     @classmethod
-    def score_if_needed(cls, df, **kwargs):
+    def score_if_needed(cls, df, keep):
         # score
         assert isinstance(df, pd.DataFrame)
         score = cls.score(df)
         df = pd.concat([df[cls.get_cols()], score], axis=1)
         assert isinstance(df, pd.DataFrame)
         # handle potential duplicate columns due to scoring
-        if 'keep' not in kwargs:
-            kwargs['keep'] = None
-        df = cls.handle_duplicate(df, keep=kwargs['keep'])
+        df = cls.handle_duplicate(df, keep)
         return df
 
     @classmethod
@@ -212,7 +214,7 @@ class Measure(Base):
         def drop_if_same(df, keep):
             assert len(df) <= 2
             # drop one if no discrepancy
-            if df.eq(df.iloc[0, :], axis='columns').all().all():
+            if (df.eq(df.iloc[0, :], axis='columns') | df.isna()).all().all():
                 ser = df.iloc[0, :]
             # decide how to drop if discrepancy
             else:
@@ -221,7 +223,7 @@ class Measure(Base):
                 else:
                     raise ExceptionWithData(
                         'Handling of duplicates undefined',
-                        df.iloc[df.index.duplicated(keep=False), :]
+                        df
                     )
             return ser
 
