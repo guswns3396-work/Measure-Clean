@@ -214,7 +214,7 @@ class Measure(Base):
         def drop_if_same(df, keep):
             assert len(df) <= 2
             # drop one if no discrepancy
-            if df.eq(df.iloc[0, :], axis='columns').all().all():
+            if (df.eq(df.iloc[0, :], axis='columns') | df.isna()).all().all():
                 ser = df.iloc[0, :]
             # decide how to drop if discrepancy
             else:
@@ -223,7 +223,7 @@ class Measure(Base):
                 else:
                     raise ExceptionWithData(
                         'Handling of duplicates undefined',
-                        df.iloc[df.index.duplicated(keep=False), :]
+                        df
                     )
             return ser
 
