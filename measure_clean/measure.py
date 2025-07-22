@@ -32,10 +32,11 @@ class Base(ABC):
         pass
 
     @classmethod
-    def process(cls, df, output_path, mapping=None, to_na=True, rev_code=False, **kwargs):
+    def process(cls, df, output_path, calc_age=None, mapping=None, to_na=True, rev_code=False, **kwargs):
         """
         :param df: DataFrame of data
         :param output_path: output path
+        :param calc_age: whether to calculate age
         :param mapping: dict mapping df column names to expected measure column names
         :param to_na: bool whether to convert invalid values to np.nan
         :param rev_code: bool whether to reverse code
@@ -47,6 +48,9 @@ class Base(ABC):
         # rename columns to match expected
         if mapping:
             df = df.rename(columns=mapping)
+
+        if calc_age is not None:
+            df = cls.calculate_age(df, how=calc_age, dob_col=kwargs['dob_col'], date_col=kwargs['date_col'])
 
         # subset to relevant columns
         df = cls.subset_relevant_cols(df)
@@ -63,6 +67,7 @@ class Base(ABC):
                 df.loc[row['index'], row['column']] = np.nan
         elif len(idx) > 0:
             raise ExceptionWithData('Invalid range', idx)
+
         # reverse code
         if rev_code:
             df = cls.reverse_code(df, kwargs['col_num'], cls.get_restr(), cls.get_min(), cls.get_max())
@@ -79,6 +84,9 @@ class Base(ABC):
 
         # reorder
         df = cls.reorder(df)
+
+        # drop na
+        df = df[~(df.isna().all(axis=1))]
 
         # save df
         if output_path is not None:
@@ -154,6 +162,36 @@ class Base(ABC):
         idx['index'] = idx['index'].map(lambda x: df.index[x])
         idx['column'] = idx['column'].map(lambda x: df.columns[x])
         return idx
+
+    @staticmethod
+    def calculate_age(df, how, dob_col, date_col):
+        """
+        calculates age based on dob and date of assessment
+        :param df: dataframe
+        :param how: whether to fill age or replace age
+        :param dob_col: column for dob
+        :param date_col: column for date
+        :return: df with age
+        """
+        df = df.reset_index().set_index('ID')
+        dob = df[dob_col].dropna()
+
+        # birthday should be unique for participant
+        assert not dob.index.duplicated().any()
+
+        # get age for each participant based on available date
+        age = np.floor((pd.to_datetime(df[date_col]) - pd.to_datetime(dob)) / pd.Timedelta(days=365.25))
+
+        if how == 'replace':
+            df['AGE'] = age
+        elif how == 'fill':
+            df['AGE'] = df['AGE'].fillna(age)
+        else:
+            raise ValueError('Invalid how argument')
+
+        df = df.reset_index().set_index(['ID', 'SES', 'AGE'])
+
+        return df
 
 
 class Measure(Base):
