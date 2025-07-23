@@ -55,6 +55,9 @@ class Base(ABC):
         # subset to relevant columns
         df = cls.subset_relevant_cols(df)
 
+        # drop all NaNs
+        df = df[~df.isna().all(axis=1)]
+
         assert not df.columns.duplicated().any()
         # check if any outside of range
         idx = cls.check_range(df)
@@ -84,9 +87,6 @@ class Base(ABC):
 
         # reorder
         df = cls.reorder(df)
-
-        # drop na
-        df = df[~(df.isna().all(axis=1))]
 
         # save df
         if output_path is not None:
@@ -123,7 +123,9 @@ class Base(ABC):
         :return: DataFrame of reverse coded data
         """
         cols = df.columns[df.columns.str.extract(re_str)[0].astype(float).isin(col_num)]
+        df = df.reset_index()
         df.loc[:, cols] = df.loc[:, cols].apply(lambda s: col_max + col_min - s)
+        df = df.set_index(['ID', 'SES', 'AGE'])
         return df
 
     @staticmethod

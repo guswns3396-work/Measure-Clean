@@ -39,12 +39,20 @@ class TestReverseCode(unittest.TestCase):
              [1, 3, 0, 2, 4]],
             columns=[f'testcol_{i}' for i in range(5)]
         )
+        df['ID'] = 0
+        df['SES'] = 1
+        df['AGE'] = 2
+        df = df.set_index(['ID', 'SES', 'AGE'])
         df_target = pd.DataFrame(
             [[4, 3, 2, 1, 0],
              [0, 1, 2, 3, 4],
              [3, 1, 4, 2, 0]],
             columns=[f'testcol_{i}' for i in range(5)]
         )
+        df_target['ID'] = 0
+        df_target['SES'] = 1
+        df_target['AGE'] = 2
+        df_target = df_target.set_index(['ID', 'SES', 'AGE'])
         df_source = Measure.reverse_code(df, [i for i in range(5)], r'testcol_(\d+)', 0, 4)
         self.assertTrue((df_source == df_target).all().all())
 
