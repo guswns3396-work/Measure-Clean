@@ -172,16 +172,38 @@ class Base(ABC):
         :param df: dataframe
         :param how: whether to fill age or replace age
         :param dob_col: column for dob
-        :param date_col: column for date
+        :param date_col: string for date column name or dict mapping session to date column
         :return: df with age
         """
-        df = df.reset_index().set_index('ID')
-        dob = df[dob_col].dropna()
-
-        # birthday should be unique for participant
+        # unique ID <-> DOB
+        dob = df.reset_index().set_index('ID')[dob_col].dropna()
         assert not dob.index.duplicated().any()
 
-        # get age for each participant based on available date
+        # date on different row as data
+        if isinstance(date_col, dict):
+            dates = []
+            for k in date_col:
+                date = df.reset_index().set_index('ID')[date_col[k]].rename('date').dropna().to_frame()
+                assert not date.index.duplicated().any()
+                date['SES'] = k
+                dates.append(date)
+            # unique ID,SES <-> date
+            dates = pd.concat(dates, axis=0).reset_index().set_index(['ID', 'SES'])['date']
+            assert not dates.index.duplicated().any()
+
+            df = df.reset_index().set_index(['ID', 'SES'])
+            date_col = '_date'
+            assert date_col not in df.columns
+            df[date_col] = dates
+            df = df.reset_index().set_index('ID')
+
+        elif isinstance(date_col, str):
+            df = df.reset_index().set_index('ID')
+
+        else:
+            raise ValueError("Invalid 'date_col' argument")
+
+        # calculate age
         age = np.floor((pd.to_datetime(df[date_col]) - pd.to_datetime(dob)) / pd.Timedelta(days=365.25))
 
         if how == 'replace':
@@ -189,9 +211,11 @@ class Base(ABC):
         elif how == 'fill':
             df['AGE'] = df['AGE'].fillna(age)
         else:
-            raise ValueError('Invalid how argument')
+            raise ValueError("Invalid 'how' argument")
 
         df = df.reset_index().set_index(['ID', 'SES', 'AGE'])
+
+        return df
 
         return df
 
