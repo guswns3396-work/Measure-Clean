@@ -34,7 +34,7 @@ class BAIS(Measure):
     @classmethod
     def check_range(cls, df):
         vals = [i for i in range(1, 4 + 1)]
-        return cls.argwhere(cls.is_invalid_discrete(df, vals))
+        return cls.argwhere(cls.is_invalid_discrete(df[cls.get_cols()], vals))
 
     @classmethod
     def score(cls, df):
