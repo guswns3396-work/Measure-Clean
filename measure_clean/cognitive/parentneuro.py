@@ -216,7 +216,7 @@ class ParentNeuro(Measure):
             (df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}2"] - df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}"]) \
             .rename(f"{cls.get_prefix()}_{var_mapping['vi_difrt']}"),
             # go no go
-            df[[f"{cls.get_prefix()}_{var_mapping['g2' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1) \
+            df[[f"{cls.get_prefix()}_{var_mapping['g2' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1, skipna=False) \
             .rename(f"{cls.get_prefix()}_{var_mapping['g2errk']}"),
             # implicit emotion
             (df[[f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}" for i in emotions[:-1]]].apply(
@@ -226,7 +226,7 @@ class ParentNeuro(Measure):
                 for i in emotions[:-1]
             }),
             # working memory
-            df[[f"{cls.get_prefix()}_{var_mapping['wm' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1) \
+            df[[f"{cls.get_prefix()}_{var_mapping['wm' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1, skipna=False) \
             .rename(f"{cls.get_prefix()}_{var_mapping['wmacck']}"),
         ]
         scores = pd.concat(scores, axis=1)
