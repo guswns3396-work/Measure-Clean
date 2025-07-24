@@ -50,7 +50,11 @@ class Base(ABC):
             df = df.rename(columns=mapping)
 
         if calc_age is not None:
-            df = cls.calculate_age(df, how=calc_age, dob_col=kwargs['dob_col'], date_col=kwargs['date_col'])
+            if 'format' in kwargs:
+                df = cls.calculate_age(df, how=calc_age, dob_col=kwargs['dob_col'],
+                                       date_col=kwargs['date_col'], format=kwargs['format'])
+            else:
+                df = cls.calculate_age(df, how=calc_age, dob_col=kwargs['dob_col'], date_col=kwargs['date_col'])
 
         # subset to relevant columns
         df = cls.subset_relevant_cols(df)
@@ -166,7 +170,7 @@ class Base(ABC):
         return idx
 
     @staticmethod
-    def calculate_age(df, how, dob_col, date_col):
+    def calculate_age(df, how, dob_col, date_col, **kwargs):
         """
         calculates age based on dob and date of assessment
         :param df: dataframe
@@ -176,46 +180,60 @@ class Base(ABC):
         :return: df with age
         """
         # unique ID <-> DOB
-        dob = df.reset_index().set_index('ID')[dob_col].dropna()
+        dob = df.reset_index().set_index('ID')[dob_col].dropna().rename('_dob')
         assert not dob.index.duplicated().any()
 
-        # date on different row as data
+        # date on different row as data => get to same row
         if isinstance(date_col, dict):
             dates = []
             for k in date_col:
-                date = df.reset_index().set_index('ID')[date_col[k]].rename('date').dropna().to_frame()
+                # unique ID <-> date
+                date = df.reset_index().set_index('ID')[date_col[k]].rename('_date').dropna().to_frame()
                 assert not date.index.duplicated().any()
                 date['SES'] = k
                 dates.append(date)
             # unique ID,SES <-> date
-            dates = pd.concat(dates, axis=0).reset_index().set_index(['ID', 'SES'])['date']
+            dates = pd.concat(dates, axis=0).reset_index().set_index(['ID', 'SES'])['_date']
             assert not dates.index.duplicated().any()
 
             df = df.reset_index().set_index(['ID', 'SES'])
-            date_col = '_date'
-            assert date_col not in df.columns
-            df[date_col] = dates
+            assert '_date' not in df.columns
+            df = df.merge(dates, how='left', left_index=True, right_index=True)
             df = df.reset_index().set_index('ID')
 
+        # same row as data
         elif isinstance(date_col, str):
+            assert '_date' not in df.columns
+            df['_date'] = df[date_col]
             df = df.reset_index().set_index('ID')
 
         else:
             raise ValueError("Invalid 'date_col' argument")
 
+        # get dob for each date
+        assert '_dob' not in df.columns
+        assert '_age' not in df.columns
+        df = df.merge(dob, how='left', left_index=True, right_index=True)
+
         # calculate age
-        age = np.floor((pd.to_datetime(df[date_col]) - pd.to_datetime(dob)) / pd.Timedelta(days=365.25))
+        if 'format' in kwargs:
+            df['_age'] = np.floor((pd.to_datetime(df['_date'], format=kwargs['format']) - pd.to_datetime(df['_dob'], format=kwargs[
+                'format'])) / pd.Timedelta(days=365.25))
+        else:
+            df['_age'] = np.floor(
+                (pd.to_datetime(df['_date']) - pd.to_datetime(df['_dob'])) / pd.Timedelta(
+                    days=365.25))
 
         if how == 'replace':
-            df['AGE'] = age
+            df['AGE'] = df['_age']
         elif how == 'fill':
-            df['AGE'] = df['AGE'].fillna(age)
+            df['AGE'] = df['AGE'].fillna(df['_age'])
         else:
             raise ValueError("Invalid 'how' argument")
 
-        df = df.reset_index().set_index(['ID', 'SES', 'AGE'])
+        df = df.drop(columns=['_date', '_dob', '_age'])
 
-        return df
+        df = df.reset_index().set_index(['ID', 'SES', 'AGE'])
 
         return df
 
