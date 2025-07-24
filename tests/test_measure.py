@@ -247,6 +247,53 @@ class TestCalculateAge(unittest.TestCase):
         self.assertTrue(source.sort_index().equals(target.sort_index()))
 
 
+class TestScoreIfNeeded(unittest.TestCase):
+
+    def setUp(self):
+        class TestMeasure(Measure):
+            @classmethod
+            def get_prefix(cls):
+                return 'test'
+
+            @classmethod
+            def get_cols(cls):
+                return [f'test_{i}' for i in range(5)]
+
+            @classmethod
+            def get_score_suffixes(cls):
+                return ['score']
+
+            @classmethod
+            def check_range(cls, df):
+                vals = [i for i in range(0, 3 + 1)]
+                return cls.argwhere(cls.is_invalid_discrete(df[cls.get_cols()], vals))
+
+            @classmethod
+            def score(cls, df):
+                score = df.sum(axis=1, skipna=False)
+                score.name = f"{cls.get_prefix()}_{cls.get_score_suffixes()[-1]}"
+                return score
+
+        self.TestMeasure = TestMeasure
+        df = pd.DataFrame(
+            [[i for i in range(5)] for j in range(5)],
+            columns=TestMeasure.get_cols()
+        )
+        df = pd.concat([df, TestMeasure.score(df)], axis=1)
+        self.df = df
+
+    def test__items_only__ScoreIfNeeded(self):
+        df = self.TestMeasure.score_if_needed(self.df[self.TestMeasure.get_cols()], keep=None)
+        self.assertTrue(len(df.columns[df.columns == 'test_score']) == 1)
+
+    def test__scores__check_range(self):
+        try:
+            df = self.TestMeasure.score_if_needed(self.df, keep=None)
+        except Exception as e:
+            df = e.data
+        self.assertTrue(len(df) == 2)
+
+
 # TODO: implement tests for other methods
 
 
