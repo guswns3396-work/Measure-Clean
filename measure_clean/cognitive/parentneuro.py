@@ -223,7 +223,7 @@ class ParentNeuro(Measure):
                 lambda s: s - df[f"{cls.get_prefix()}_{var_mapping['dgtrt']}N"]
             )).rename(columns={
                 f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}": f"{cls.get_prefix()}_{var_mapping['dgtcn']}{i}"
-                for i in emotions[-1]
+                for i in emotions[:-1]
             }),
             # working memory
             df[[f"{cls.get_prefix()}_{var_mapping['wm' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1) \
