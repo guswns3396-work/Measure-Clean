@@ -1,4 +1,6 @@
 import unittest
+from abc import ABC
+
 import numpy as np
 import pandas as pd
 from measure_clean.measure import Measure
@@ -24,9 +26,53 @@ class TestInstantiation(unittest.TestCase):
             def score(cls, df):
                 pass
 
-        self.TestMeasure = TestMeasure()
+        self.TestMeasure = TestMeasure
 
     # TODO: implement rest of instantiation
+
+
+class TestCheckRange(unittest.TestCase):
+
+    def setUp(self):
+        class TestMeasure(Measure):
+            @classmethod
+            def get_prefix(cls):
+                return 'test'
+
+            @classmethod
+            def get_cols(cls):
+                return [f'test_{i}' for i in range(5)]
+
+            @classmethod
+            def get_score_suffixes(cls):
+                return ['score']
+
+            @classmethod
+            def check_range(cls, df):
+                vals = [i for i in range(0, 3 + 1)]
+                return cls.argwhere(cls.is_invalid_discrete(df[cls.get_cols()], vals))
+
+            @classmethod
+            def score(cls, df):
+                score = df.sum(axis=1, skipna=False)
+                score.name = f"{cls.get_prefix()}_{cls.get_score_suffixes()[-1]}"
+                return score
+
+        self.TestMeasure = TestMeasure
+        df = pd.DataFrame(
+            [[i for i in range(5)] for j in range(5)],
+            columns=TestMeasure.get_cols()
+        )
+        df = pd.concat([df, TestMeasure.score(df)], axis=1)
+        self.df = df
+
+    def test__items_only__check_range(self):
+        idx = self.TestMeasure.check_range(self.df[self.TestMeasure.get_cols()])
+        self.assertEqual(len(idx), 5)
+
+    def test__scores__check_range(self):
+        idx = self.TestMeasure.check_range(self.df)
+        self.assertEqual(len(idx), 5)
 
 
 class TestReverseCode(unittest.TestCase):
