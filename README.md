@@ -3,7 +3,7 @@ Package to clean datasets
 # TODO
 * implement unit tests
 * data dictionary for each measure
-* check_range should only check range for items not scores
+* ~~check_range should only check range for items not scores~~
 * include function for aggregating 
   * output as wide
 * option for how to handle missing
