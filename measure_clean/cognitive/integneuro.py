@@ -67,11 +67,11 @@ class IntegNeuroCompatible(ParentNeuro):
             'gngsdrt',
 
             # delayed verbal recall
-            'memtot7',
+            'memrec7',
 
             # implicit emotion
             *[f'cdsgcn{i}' for i in emotions[:-1]],
-            *[f'cdsgcrt{i}' for i in emotions],
+            *[f'cdsgrt{i}' for i in emotions],
 
             # working memory
             'wmerr',
@@ -103,22 +103,27 @@ class IntegNeuroCompatible(ParentNeuro):
             'vcrtne': 'vcrtne',
             'vi_sco': 'vi_sco',
             'vi_err': 'vi_err',
+            'vi_difrt': 'vi_difrt',
             'scavr0t': 'scavr0t',
             'esoadur': 'swoadur',
             'esoaerr': 'swoaerr',
             'g2avrtk': 'gngavrt',
             'g2fnk': 'gngfn',
             'g2fpk': 'gngfp',
+            'g2errk': 'gngerr',
             'g2sdrtk': 'gngsdrt',
-            'ctmrec4': 'memtot7',
-            'dgtcrt': 'cdsgcrt',
+            'ctmrec4': 'memrec7',
+            'dgtrt': 'cdsgrt',
+            'dgtcn': 'cdsgcn',
             'wmfnk': 'wmfn',
             'wmfpk': 'wmfp',
+            'wmacck': 'wmerr',
             'wmrtk': 'wmrt',
             'emzcompk': 'emzcmpin',
             'emzinitk': 'emziniin',
             'emzoverk': 'emzovrin',
-            'emzerrk': 'emzovrin',
+            'emzerrk': 'emzerrin',
             'emztrlsk': 'emztrlin'
         }
+
         return mapping
