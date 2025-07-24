@@ -132,6 +132,34 @@ class TestHandleDuplicate(unittest.TestCase):
 
         self.assertTrue((target == source).all().all())
 
+    def test__last_all_nans__handle_duplicate(self):
+        df = pd.DataFrame(
+            [[1, 2, 3, 10, np.nan, 11],
+             [4, 5, 6, 11, np.nan, 12]],
+            columns=['a', 'b', 'c', 'd', 'c', 'd']
+        )
+        target = pd.DataFrame(
+            [[1, 2, np.nan, 11],
+             [4, 5, np.nan, 12]],
+            columns=['a', 'b', 'c', 'd']
+        )
+        source = Measure.handle_duplicate(df, keep='last')
+        self.assertTrue(source.astype(float).equals(target.astype(float)))
+
+    def test__first_all_nans__handle_duplicate(self):
+        df = pd.DataFrame(
+            [[1, 2, np.nan, 10, 3, 11],
+             [4, 5, np.nan, 11, 4, 12]],
+            columns=['a', 'b', 'c', 'd', 'c', 'd']
+        )
+        target = pd.DataFrame(
+            [[1, 2, np.nan, 10],
+             [4, 5, np.nan, 11]],
+            columns=['a', 'b', 'c', 'd']
+        )
+        source = Measure.handle_duplicate(df, keep='first')
+        self.assertTrue(source.astype(float).equals(target.astype(float)))
+
 
 class TestCalculateAge(unittest.TestCase):
     def setUp(self) -> None:
@@ -282,11 +310,11 @@ class TestScoreIfNeeded(unittest.TestCase):
         df = pd.concat([df, TestMeasure.score(df)], axis=1)
         self.df = df
 
-    def test__items_only__ScoreIfNeeded(self):
+    def test__items_only__score_if_needed(self):
         df = self.TestMeasure.score_if_needed(self.df[self.TestMeasure.get_cols()], keep=None)
         self.assertTrue(len(df.columns[df.columns == 'test_score']) == 1)
 
-    def test__scores__check_range(self):
+    def test__scores__score_if_needed(self):
         try:
             df = self.TestMeasure.score_if_needed(self.df, keep=None)
         except Exception as e:

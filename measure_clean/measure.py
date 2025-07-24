@@ -299,7 +299,7 @@ class Measure(Base):
         def drop_if_same(df, keep):
             assert len(df) <= 2
             # drop one if no discrepancy
-            if (df.eq(df.iloc[0, :], axis='columns') | df.isna()).all().all():
+            if (df.eq(df.iloc[0, :], axis='columns').all(axis=0) | df.isna().all(axis=0)).all():
                 ser = df.iloc[0, :]
             # decide how to drop if discrepancy
             else:
@@ -313,5 +313,5 @@ class Measure(Base):
             return ser
 
         df = df.T
-        df = df.groupby(df.index).apply(lambda x: drop_if_same(x, keep))
+        df = df.groupby(df.index, dropna=False).apply(lambda x: drop_if_same(x, keep))
         return df.T
