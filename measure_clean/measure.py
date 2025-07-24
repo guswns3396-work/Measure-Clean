@@ -322,6 +322,6 @@ class Measure(Base):
         if errors:
             raise ExceptionWithData(
                 'Handling of duplicates undefined',
-                errors
+                pd.concat(errors, axis=0).T
             )
         return df.T
