@@ -1,2 +1,2 @@
-__all__ = ['webneuro']
-from . import webneuro
+__all__ = ['webneuro', 'integneuro']
+from . import webneuro, integneuro
