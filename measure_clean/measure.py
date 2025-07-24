@@ -258,13 +258,16 @@ class Measure(Base):
         pass
 
     @classmethod
+    def get_score_cols(cls):
+        if len(cls.get_score_suffixes()) == 0:
+            return []
+        else:
+            return [f"{cls.get_prefix()}_{x}" for x in cls.get_score_suffixes()]
+
+    @classmethod
     def subset_relevant_cols(cls, df):
         # subset to relevant columns depending on if score already included
-        if len(cls.get_score_suffixes()) == 0:
-            cls.score_cols = []
-        else:
-            cls.score_cols = [f"{cls.get_prefix()}_{x}" for x in cls.get_score_suffixes()]
-        df = df.loc[:, [*cls.get_cols(), *df.columns[df.columns.isin(cls.score_cols)]]]
+        df = df.loc[:, [*cls.get_cols(), *df.columns[df.columns.isin(cls.get_score_cols())]]]
         return df
 
     @classmethod
@@ -272,7 +275,7 @@ class Measure(Base):
         # score
         assert isinstance(df, pd.DataFrame)
         score = cls.score(df)
-        df = pd.concat([df[cls.get_cols()], score], axis=1)
+        df = pd.concat([df[[*cls.get_cols(), *df.columns[df.columns.isin(cls.get_score_cols())]]], score], axis=1)
         assert isinstance(df, pd.DataFrame)
         # handle potential duplicate columns due to scoring
         df = cls.handle_duplicate(df, keep)
@@ -280,7 +283,7 @@ class Measure(Base):
 
     @classmethod
     def reorder(cls, df):
-        df = df[[*cls.get_cols(), *df.columns[df.columns.isin(cls.score_cols)]]]
+        df = df[[*cls.get_cols(), *df.columns[df.columns.isin(cls.get_score_cols())]]]
         return df
 
     @staticmethod
