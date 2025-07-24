@@ -130,7 +130,7 @@ class TestHandleDuplicate(unittest.TestCase):
         except Exception as e:
             source = e.data
 
-        self.assertTrue((target == source).all().all())
+        self.assertTrue((target == source[0]).all().all())
 
     def test__last_all_nans__handle_duplicate(self):
         df = pd.DataFrame(
@@ -318,9 +318,9 @@ class TestScoreIfNeeded(unittest.TestCase):
         try:
             df = self.TestMeasure.score_if_needed(self.df, keep=None)
         except Exception as e:
-            df = e.data
-        self.assertTrue(len(df) == 2)
-
+            source = e.data[0]
+        target = pd.concat([self.df['test_score'], self.TestMeasure.score(self.df)], axis=1)
+        self.assertTrue((source == target.T).all().all())
 
 # TODO: implement tests for other methods
 

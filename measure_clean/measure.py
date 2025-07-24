@@ -217,8 +217,9 @@ class Base(ABC):
 
         # calculate age
         if 'format' in kwargs:
-            df['_age'] = np.floor((pd.to_datetime(df['_date'], format=kwargs['format']) - pd.to_datetime(df['_dob'], format=kwargs[
-                'format'])) / pd.Timedelta(days=365.25))
+            df['_age'] = np.floor(
+                (pd.to_datetime(df['_date'], format=kwargs['format']) - pd.to_datetime(df['_dob'], format=kwargs[
+                    'format'])) / pd.Timedelta(days=365.25))
         else:
             df['_age'] = np.floor(
                 (pd.to_datetime(df['_date']) - pd.to_datetime(df['_dob'])) / pd.Timedelta(
@@ -296,22 +297,31 @@ class Measure(Base):
         :return: pd.DataFrame of scored data without duplicate columns
         """
 
-        def drop_if_same(df, keep):
+        def drop_if_same(df, keep, errors):
             assert len(df) <= 2
+            # only one row
+            if len(df) == 1:
+                ser = df.iloc[0]
             # drop one if no discrepancy
-            if (df.eq(df.iloc[0, :], axis='columns').all(axis=0) | df.isna().all(axis=0)).all():
+            elif (df.eq(df.iloc[0, :], axis='columns').all(axis=0) | df.isna().all(axis=0)
+                    | pd.Series(np.isclose(df.iloc[0], df.iloc[1]), index=df.columns)).all():
                 ser = df.iloc[0, :]
             # decide how to drop if discrepancy
             else:
                 if keep:
                     ser = df.iloc[~df.index.duplicated(keep=keep), :].squeeze()
                 else:
-                    raise ExceptionWithData(
-                        'Handling of duplicates undefined',
-                        df
-                    )
+                    errors.append(df)
+                    ser = None
+
             return ser
 
         df = df.T
-        df = df.groupby(df.index, dropna=False).apply(lambda x: drop_if_same(x, keep))
+        errors = []
+        df = df.groupby(df.index, dropna=False).apply(lambda x: drop_if_same(x, keep, errors))
+        if errors:
+            raise ExceptionWithData(
+                'Handling of duplicates undefined',
+                errors
+            )
         return df.T
