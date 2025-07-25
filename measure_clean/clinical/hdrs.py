@@ -15,7 +15,7 @@ class HDRS(Measure):
     @classmethod
     def score(cls, df):
         df = df[[f"{cls.get_prefix()}_{i}" for i in range(1, 17 + 1)]]
-        score = df.sum(axis=1, skipna=False)
+        score = df[cls.get_cols()].sum(axis=1, skipna=False)
         score.name = f"{cls.get_prefix()}_{cls.get_score_suffixes()[-1]}"
         return score
 

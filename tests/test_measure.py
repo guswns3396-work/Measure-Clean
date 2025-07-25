@@ -54,7 +54,7 @@ class TestCheckRange(unittest.TestCase):
 
             @classmethod
             def score(cls, df):
-                score = df.sum(axis=1, skipna=False)
+                score = df[cls.get_cols()].sum(axis=1, skipna=False)
                 score.name = f"{cls.get_prefix()}_{cls.get_score_suffixes()[-1]}"
                 return score
 
@@ -297,7 +297,7 @@ class TestScoreIfNeeded(unittest.TestCase):
 
             @classmethod
             def score(cls, df):
-                score = df.sum(axis=1, skipna=False)
+                score = df[cls.get_cols()].sum(axis=1, skipna=False)
                 score.name = f"{cls.get_prefix()}_{cls.get_score_suffixes()[-1]}"
                 return score
 
