@@ -194,11 +194,17 @@ class ParentNeuro(Measure):
                   | (df[f"{cls.get_prefix()}_{var_mapping['emztrlsk']}"].isna()))
             ),
             # maze comp time > maze init time
-            cls.argwhere((df[f"{cls.get_prefix()}_{var_mapping['emzcompk']}"]
-                          > df[f"{cls.get_prefix()}_{var_mapping['emzinitk']}"]).rename('emzcompk')),
+            cls.argwhere(~((df[f"{cls.get_prefix()}_{var_mapping['emzcompk']}"]
+                            > df[f"{cls.get_prefix()}_{var_mapping['emzinitk']}"]) |
+                           df[[f"{cls.get_prefix()}_{var_mapping['emzcompk']}",
+                               f"{cls.get_prefix()}_{var_mapping['emzinitk']}"]].isna().any(axis=1))
+                         .rename(f"{cls.get_prefix()}_{var_mapping['emzcompk']}")),
             # emzerr > emzover
-            cls.argwhere((df[f"{cls.get_prefix()}_{var_mapping['emzerrk']}"]
-                          > df[f"{cls.get_prefix()}_{var_mapping['emzoverk']}"]).rename('emzerrk'))
+            cls.argwhere(~((df[f"{cls.get_prefix()}_{var_mapping['emzerrk']}"]
+                           > df[f"{cls.get_prefix()}_{var_mapping['emzoverk']}"]) |
+                           df[[f"{cls.get_prefix()}_{var_mapping['emzerrk']}",
+                               f"{cls.get_prefix()}_{var_mapping['emzoverk']}"]].isna().any(axis=1))
+                         .rename(f"{cls.get_prefix()}_{var_mapping['emzerrk']}")),
         ]
         return pd.concat(idx, axis=0)
 
@@ -214,10 +220,10 @@ class ParentNeuro(Measure):
         scores = [
             # verbal interference
             (df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}2"] - df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}"]) \
-            .rename(f"{cls.get_prefix()}_{var_mapping['vi_difrt']}"),
+                .rename(f"{cls.get_prefix()}_{var_mapping['vi_difrt']}"),
             # go no go
             df[[f"{cls.get_prefix()}_{var_mapping['g2' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1, skipna=False) \
-            .rename(f"{cls.get_prefix()}_{var_mapping['g2errk']}"),
+                .rename(f"{cls.get_prefix()}_{var_mapping['g2errk']}"),
             # implicit emotion
             (df[[f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}" for i in emotions[:-1]]].apply(
                 lambda s: s - df[f"{cls.get_prefix()}_{var_mapping['dgtrt']}N"]
@@ -227,7 +233,7 @@ class ParentNeuro(Measure):
             }),
             # working memory
             df[[f"{cls.get_prefix()}_{var_mapping['wm' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1, skipna=False) \
-            .rename(f"{cls.get_prefix()}_{var_mapping['wmacck']}"),
+                .rename(f"{cls.get_prefix()}_{var_mapping['wmacck']}"),
         ]
         scores = pd.concat(scores, axis=1)
         return scores
