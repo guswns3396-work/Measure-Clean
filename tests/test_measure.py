@@ -314,12 +314,22 @@ class TestScoreIfNeeded(unittest.TestCase):
         self.assertTrue(len(df.columns[df.columns == 'test_score']) == 1)
 
     def test__scores__score_if_needed(self):
+        df = self.df
+        # change so there is discrepancy
+        df.loc[0, 'test_score'] = 1
         try:
-            df = self.TestMeasure.score_if_needed(self.df, keep=None)
+            df = self.TestMeasure.score_if_needed(df, keep=None)
         except Exception as e:
             source = e.data
         target = pd.concat([self.df['test_score'], self.TestMeasure.score(self.df)], axis=1)
         self.assertTrue((source == target).all().all())
+
+    def test__no_discrepancy__score_if_needed(self):
+        df = self.df
+        source = self.TestMeasure.score_if_needed(df, keep=None)
+        target = self.df
+        self.assertTrue((source == target).all().all())
+
 
 # TODO: implement tests for other methods
 
