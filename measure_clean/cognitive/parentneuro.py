@@ -75,12 +75,12 @@ class ParentNeuro(Measure):
             # explicit emotion
             # check accuracy
             cls.argwhere(
-                cls.is_invalid_perc(df[[f"{cls.get_prefix()}_{var_mapping['getcp']}{i}" for i in emotions]])
+                cls.is_invalid_perc(df[[f"{cls.get_prefix()}_{var_mapping['getcp' + i]}" for i in emotions]])
             ),
             # check rt > 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['getrt']}{i}" for i in emotions]] > 0)
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['getrt']}{i}" for i in emotions]].isna()))
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['getrt' + i]}" for i in emotions]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['getrt' + i]}" for i in emotions]].isna()))
             ),
 
             # digit span
@@ -92,36 +92,36 @@ class ParentNeuro(Measure):
             # verbal interference
             # check rt > 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['vcrtne']}{i}" for i in ['', '2']]] > 0)
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['vcrtne']}{i}" for i in ['', '2']]].isna()))
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['vcrtne' + i]}" for i in ['', '2']]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['vcrtne' + i]}" for i in ['', '2']]].isna()))
             ),
             # check score >= 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['vi_sco']}{i}" for i in [1, 2]]] >= 0)
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['vi_sco']}{i}" for i in [1, 2]]].isna()))
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['vi_sco' + str(i)]}" for i in [1, 2]]] >= 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['vi_sco' + str(i)]}" for i in [1, 2]]].isna()))
             ),
             # check err >= 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['vi_err']}{i}" for i in [1, 2]]] >= 0)
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['vi_err']}{i}" for i in [1, 2]]].isna()))
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['vi_err' + str(i)]}" for i in [1, 2]]] >= 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['vi_err' + str(i)]}" for i in [1, 2]]].isna()))
             ),
 
             # switching of attention
             # connection time > 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['scavr0t']}{i}" for i in [1, 2]]] > 0)
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['scavr0t']}{i}" for i in [1, 2]]].isna()))
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['scavr0t' + str(i)]}" for i in [1, 2]]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['scavr0t' + str(i)]}" for i in [1, 2]]].isna()))
             ),
             # duration > 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['esoadur']}{i}" for i in [1, 2]]] > 0)
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['esoadur']}{i}" for i in [1, 2]]].isna()))
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['esoadur' + str(i)]}" for i in [1, 2]]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['esoadur' + str(i)]}" for i in [1, 2]]].isna()))
             ),
             # 0 <= errors <= 25
             cls.argwhere(
-                ~(((df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]] >= 0)
-                   & (df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]] <= 25))
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['esoaerr']}{i}" for i in [1, 2]]].isna()))
+                ~(((df[[f"{cls.get_prefix()}_{var_mapping['esoaerr' + str(i)]}" for i in [1, 2]]] >= 0)
+                   & (df[[f"{cls.get_prefix()}_{var_mapping['esoaerr' + str(i)]}" for i in [1, 2]]] <= 25))
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['esoaerr' + str(i)]}" for i in [1, 2]]].isna()))
             ),
 
             # go no go
@@ -151,8 +151,8 @@ class ParentNeuro(Measure):
             # implicit emotion
             # rt > 0
             cls.argwhere(
-                ~((df[[f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}" for i in emotions]] > 0)
-                  | (df[[f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}" for i in emotions]].isna()))
+                ~((df[[f"{cls.get_prefix()}_{var_mapping['dgtrt' + i]}" for i in emotions]] > 0)
+                  | (df[[f"{cls.get_prefix()}_{var_mapping['dgtrt' + i]}" for i in emotions]].isna()))
             ),
 
             # working memory
@@ -219,16 +219,16 @@ class ParentNeuro(Measure):
         var_mapping = cls.get_var_mapping()
         scores = [
             # verbal interference
-            (df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}2"] - df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}"]) \
+            (df[f"{cls.get_prefix()}_{var_mapping['vcrtne2']}"] - df[f"{cls.get_prefix()}_{var_mapping['vcrtne']}"]) \
                 .rename(f"{cls.get_prefix()}_{var_mapping['vi_difrt']}"),
             # go no go
             df[[f"{cls.get_prefix()}_{var_mapping['g2' + i + 'k']}" for i in ['fn', 'fp']]].sum(axis=1, skipna=False) \
                 .rename(f"{cls.get_prefix()}_{var_mapping['g2errk']}"),
             # implicit emotion
-            (df[[f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}" for i in emotions[:-1]]].apply(
-                lambda s: s - df[f"{cls.get_prefix()}_{var_mapping['dgtrt']}N"]
+            (df[[f"{cls.get_prefix()}_{var_mapping['dgtrt' + i]}" for i in emotions[:-1]]].apply(
+                lambda s: s - df[f"{cls.get_prefix()}_{var_mapping['dgtrtN']}"]
             )).rename(columns={
-                f"{cls.get_prefix()}_{var_mapping['dgtrt']}{i}": f"{cls.get_prefix()}_{var_mapping['dgtcn']}{i}"
+                f"{cls.get_prefix()}_{var_mapping['dgtrt' + i]}": f"{cls.get_prefix()}_{var_mapping['dgtcn' + i]}"
                 for i in emotions[:-1]
             }),
             # working memory
