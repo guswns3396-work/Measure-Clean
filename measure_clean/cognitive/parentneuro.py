@@ -195,13 +195,13 @@ class ParentNeuro(Measure):
             ),
             # maze comp time > maze init time
             cls.argwhere(~((df[f"{cls.get_prefix()}_{var_mapping['emzcompk']}"]
-                            > df[f"{cls.get_prefix()}_{var_mapping['emzinitk']}"]) |
+                            >= df[f"{cls.get_prefix()}_{var_mapping['emzinitk']}"]) |
                            df[[f"{cls.get_prefix()}_{var_mapping['emzcompk']}",
                                f"{cls.get_prefix()}_{var_mapping['emzinitk']}"]].isna().any(axis=1))
                          .rename(f"{cls.get_prefix()}_{var_mapping['emzcompk']}")),
             # emzerr > emzover
             cls.argwhere(~((df[f"{cls.get_prefix()}_{var_mapping['emzerrk']}"]
-                           > df[f"{cls.get_prefix()}_{var_mapping['emzoverk']}"]) |
+                           >= df[f"{cls.get_prefix()}_{var_mapping['emzoverk']}"]) |
                            df[[f"{cls.get_prefix()}_{var_mapping['emzerrk']}",
                                f"{cls.get_prefix()}_{var_mapping['emzoverk']}"]].isna().any(axis=1))
                          .rename(f"{cls.get_prefix()}_{var_mapping['emzerrk']}")),
