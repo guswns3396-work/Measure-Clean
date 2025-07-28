@@ -93,9 +93,9 @@ class Base(ABC):
         df = cls.reorder(df)
 
         # make age int
-        # df = df.reset_index()
-        # df['AGE'] = df['AGE'].apply(lambda x: np.floor(x))
-        # df = df.set_index(['ID', 'SES', 'AGE'])
+        df = df.reset_index()
+        df['AGE'] = df['AGE'].apply(lambda x: np.floor(x))
+        df = df.set_index(['ID', 'SES', 'AGE'])
 
         # save df
         if output_path is not None:
