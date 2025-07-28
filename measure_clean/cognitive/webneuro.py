@@ -70,7 +70,7 @@ class WebNeuroCompatible(ParentNeuro):
             'ctmrec4',
 
             # implicit emotion
-            *[f'dgtcrtn{i}' for i in emotions[:-1]],
+            *[f'dgtcn{i}' for i in emotions[:-1]],
             *[f'dgtrt{i}' for i in emotions],
 
             # working memory
