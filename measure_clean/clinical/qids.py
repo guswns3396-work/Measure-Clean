@@ -37,7 +37,7 @@ class QIDS(Measure):
             # appetite / weight subscore (items 6-9)
             np.nanmax(df[[fr"{cls.get_prefix()}_{i}" for i in range(6, 9 + 1)]], axis=1),
             # items 10-14
-            np.sum(df[[fr"{cls.get_prefix()}_{i}" for i in range(10, 14 + 1)]], axis=1),
+            np.sum(df[[fr"{cls.get_prefix()}_{i}" for i in range(10, 14 + 1)]].values, axis=1),
             # psychomotor subscore
             np.nanmax(df[[fr"{cls.get_prefix()}_{i}" for i in range(15, 16 + 1)]], axis=1)
         )
