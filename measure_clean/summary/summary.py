@@ -53,6 +53,16 @@ class Summary(Base):
                     'other_eatdisorder_current'
                 ]]],
                 [1, 0]
-            ))
+            )),
+            cls.argwhere(~df[f"{cls.get_prefix()}_race"].isin([
+                'American Indian/Alaska Native',
+                'Asian',
+                'Native Hawaiian or Other Pacific Islander',
+                'Black or African American',
+                'White',
+                'More Than One Race',
+                'Other',
+                'Unknown / Not Reported'
+            ]))
         ]
         return pd.concat(idx, axis=0)
