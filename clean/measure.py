@@ -32,6 +32,11 @@ class Base(ABC):
         pass
 
     @classmethod
+    def get_data_dict(cls):
+        # TODO
+        pass
+
+    @classmethod
     def process(cls, df, output_path, calc_age=None, mapping=None, to_na=True, rev_code=False, **kwargs):
         """
         :param df: DataFrame of data

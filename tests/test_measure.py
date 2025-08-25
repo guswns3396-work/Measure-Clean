@@ -3,7 +3,7 @@ from abc import ABC
 
 import numpy as np
 import pandas as pd
-from measure_clean.measure import Measure
+from clean.measure import Measure
 
 
 class TestInstantiation(unittest.TestCase):

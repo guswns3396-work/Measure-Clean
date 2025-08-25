@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import pandas as pd
-from measure_clean.clinical.qids import QIDS
+from clean.clinical.qids import QIDS
 
 
 class TestScore(unittest.TestCase):

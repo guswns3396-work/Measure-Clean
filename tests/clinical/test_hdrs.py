@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import pandas as pd
-from measure_clean.clinical.hdrs import HDRS21, HDRS17
+from clean.clinical.hdrs import HDRS21, HDRS17
 
 
 # TODO: test other versions of HDRS than HDRS21
