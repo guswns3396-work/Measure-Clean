@@ -1,9 +1,8 @@
 import unittest
-from abc import ABC
 
 import numpy as np
 import pandas as pd
-from clean.measure import Measure
+from psypy.clean.measure import Measure
 
 
 class TestInstantiation(unittest.TestCase):

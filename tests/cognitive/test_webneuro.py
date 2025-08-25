@@ -1,7 +1,5 @@
 import unittest
-import numpy as np
-import pandas as pd
-from clean.cognitive.webneuro import WebNeuroCompatible
+from psypy.clean.cognitive.webneuro import WebNeuroCompatible
 
 
 class TestProcess(unittest.TestCase):
